@@ -10,6 +10,11 @@ import requests
 from requests.auth import HTTPBasicAuth
 
 
+__version__ = "0.1.0"
+__author__ = "Uilian Ries <uilianries@gmail.com>"
+__license__ = "MIT"
+
+
 class Bintray(object):
     """ Python Wrapper for Bintray API
 
