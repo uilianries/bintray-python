@@ -10,7 +10,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __author__ = "Uilian Ries <uilianries@gmail.com>"
 __license__ = "MIT"
 
@@ -34,7 +34,7 @@ class Bintray(object):
 
         self._logger = logging.getLogger(__file__)
         self._logger.setLevel(logging.INFO)
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        formatter = logging.Formatter('%(asctime)s:%(levelname)s: %(message)s')
         ch = logging.StreamHandler()
         ch.setLevel(logging.INFO)
         ch.setFormatter(formatter)
