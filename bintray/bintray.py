@@ -36,7 +36,8 @@ class Bintray(object):
         self._logger.setLevel(logging.INFO)
         formatter = logging.Formatter('%(asctime)s:%(levelname)s: %(message)s')
         ch = logging.StreamHandler()
-        ch.setLevel(logging.INFO)
+        level = int(os.getenv("BINTRAY_LOGGING_LEVEL", logging.INFO))
+        ch.setLevel(level)
         ch.setFormatter(formatter)
         self._logger.addHandler(ch)
 
