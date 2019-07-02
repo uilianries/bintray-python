@@ -4,6 +4,8 @@
 
 # Bintray Python
 
+![logo](logo.png)
+
 **The Python wrapper for Bintray API**
 
 #### DOCUMENTATION
