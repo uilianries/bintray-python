@@ -31,14 +31,14 @@ def get_requires(filename):
 def load_version():
     """Loads a file content"""
     filename = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                            "bincrafters_conventions", "bincrafters_conventions.py"))
+                                            "bintray", "bintray.py"))
     with open(filename, "rt") as version_file:
         conan_init = version_file.read()
         version = re.search("__version__ = '([0-9a-z.-]+)'", conan_init).group(1)
         return version
 
 setup(
-    name='bincrafters_conventions',
+    name='bintray-python',
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
