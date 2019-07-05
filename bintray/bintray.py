@@ -107,6 +107,45 @@ class Bintray(object):
 
     # Licenses
 
+    def get_org_proprietary_licenses(self, org):
+        """ Get a list of custom, proprietary licenses associated with an organization
+
+        :param org: Organization name
+        :return: Licenses list
+        """
+        url = "{}/orgs/{}/licenses".format(Bintray.BINTRAY_URL, org)
+        return self._requester.get(url)
+
+    def get_user_proprietary_licenses(self, user):
+        """ Get a list of custom, proprietary licenses associated with an user
+
+        :param user: User name
+        :return: Licenses list
+        """
+        url = "{}/users/{}/licenses".format(Bintray.BINTRAY_URL, user)
+        return self._requester.get(url)
+
+    def create_org_proprietary_license(self, org, license):
+        """ Create a license associated with an organization.
+            Caller must be an admin of the organization.
+
+        :param org: Organization name
+        :param license: JSON data with license information
+        :return: request answer
+        """
+        url = "{}/orgs/{}/licenses".format(Bintray.BINTRAY_URL, org)
+        return self._requester.post(url, json=license)
+
+    def create_user_proprietary_license(self, user, license):
+        """ Create a license associated with an user.
+
+        :param user: User name
+        :param license: JSON data with license information
+        :return: request answer
+        """
+        url = "{}/users/{}/licenses".format(Bintray.BINTRAY_URL, user)
+        return self._requester.post(url, json=license)
+
     def get_oss_licenses(self):
         """ Returns a list of all the OSS licenses.
 
