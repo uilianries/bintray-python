@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 from bintray.bintray import Bintray
@@ -18,5 +17,5 @@ def test_bad_credentials_for_get_oss_licenses():
         bintray.get_oss_licenses()
     except Exception as error:
         error_message = str(error)
-    assert "Could not get OSS licenses (401): 401 Client Error: Unauthorized for url: " \
+    assert "Could not GET (401): 401 Client Error: Unauthorized for url: " \
             "https://api.bintray.com/licenses/oss_licenses" == error_message
