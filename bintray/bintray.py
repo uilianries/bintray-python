@@ -63,7 +63,6 @@ class Bintray(object):
             json_data.update({"statusCode": response.status_code, "error": not response.ok})
         return json_data
 
-
     def _bool_to_number(self, value):
         """ Convert boolean result into numeric string
 
@@ -153,3 +152,17 @@ class Bintray(object):
             local_fd.write(response.content)
         self._logger.info("Download successfully: {}".format(url))
         return self._add_status_code(response)
+
+    # Licenses
+
+    def get_oss_licenses(self):
+        """ Returns a list of all the OSS licenses.
+
+        :return: List with OSS licenses
+        """
+        url = "{}/licenses/oss_licenses".format(Bintray.BINTRAY_URL)
+        response = requests.get(url, auth=self._get_authentication())
+        if not response.ok:
+            self._raise_error("Could not get OSS licenses", response)
+        return self._add_status_code(response)
+
