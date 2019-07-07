@@ -48,11 +48,11 @@ class Bintray(object):
         :return: List with all files
         """
         parameters = {"include_unpublished": bool_to_number(include_unpublished)}
-        url = "{}/packages/{}/{}/{}/files?include_unpublished={}".format(Bintray.BINTRAY_URL,
-                                                                subject,
-                                                                repo,
-                                                                package,
-                                                                include_unpublished)
+        url = "{}/packages/{}/{}/{}/files".format(Bintray.BINTRAY_URL,
+                                                  subject,
+                                                  repo,
+                                                  package,
+                                                  include_unpublished)
         return self._requester.get(url, parameters)
 
     def get_version_files(self, subject, repo, package, version, include_unpublished=False):
@@ -77,13 +77,43 @@ class Bintray(object):
         :return: List with all files
         """
         parameters = {"include_unpublished": bool_to_number(include_unpublished)}
-        url = "{}/packages/{}/{}/{}/versions/{}/files?include_unpublished={}".format(
-                                                                Bintray.BINTRAY_URL,
-                                                                subject,
-                                                                repo,
-                                                                package,
-                                                                version,
-                                                                include_unpublished)
+        url = "{}/packages/{}/{}/{}/versions/{}/files".format(Bintray.BINTRAY_URL,
+                                                              subject,
+                                                              repo,
+                                                              package,
+                                                              version,
+                                                              include_unpublished)
+        return self._requester.get(url, parameters)
+
+    def file_search_by_name(self, name, subject=None, repo=None, start_pos=None,
+                            created_after=None):
+        """ Search for a file by its name. name can take the * and ? wildcard characters.
+
+            May take an optional subject and/or repo name to search in and/or created_after
+            search from the 'dateCreatedAfter' until today.
+            The 'dateCreatedAfter' is defined in the following ISO8601 format (yyyy-MM-
+            dd’T’HH:mm:ss.SSSZ). Returns an array of results, where elements are similar
+            to the result of getting package files. Search results will not contain private files.
+
+            Security: Authentication is not required
+
+        :param name: File to be searched
+        :param subject: File subject to filter
+        :param repo: File repo filter
+        :param start_pos: Start position name to filter
+        :param created_after: Creation date to filter
+        :return: Package found. Otherwise, error.
+        """
+        parameters = {}
+        if subject:
+            parameters["subject"] = str(subject)
+        if repo:
+            parameters["repo"] = str(repo)
+        if start_pos:
+            parameters["start_pos"] = str(start_pos)
+        if created_after:
+            parameters["created_after"] = str(created_after)
+        url = "{}/search/file".format(Bintray.BINTRAY_URL)
         return self._requester.get(url, parameters)
 
     # Content Uploading & Publishing
