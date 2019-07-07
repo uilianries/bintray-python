@@ -146,6 +146,29 @@ class Bintray(object):
         url = "{}/users/{}/licenses".format(Bintray.BINTRAY_URL, user)
         return self._requester.post(url, json=license)
 
+    def update_org_proprietary_license(self, org, custom_license_name, license):
+        """ Update a license associated with an organization.
+            Caller must be an admin of the organization.
+
+        :param org: Organization name
+        :param custom_license_name: License to be updated
+        :param license: JSON data with license information
+        :return: request answer
+        """
+        url = "{}/orgs/{}/licenses/{}".format(Bintray.BINTRAY_URL, org, custom_license_name)
+        return self._requester.patch(url, json=license)
+
+    def update_user_proprietary_license(self, user, custom_license_name, license):
+        """ Update a license associated with an user.
+
+        :param user: User name
+        :param custom_license_name: License to be updated
+        :param license: JSON data with license information
+        :return: request answer
+        """
+        url = "{}/users/{}/licenses/{}".format(Bintray.BINTRAY_URL, user, custom_license_name)
+        return self._requester.patch(url, json=license)
+
     def get_oss_licenses(self):
         """ Returns a list of all the OSS licenses.
 
