@@ -104,3 +104,15 @@ class Requester(object):
         if not response.ok:
             self._raise_error("Could not PATCH", response)
         return self._add_status_code(response)
+
+    def delete(self, url, params=None):
+        """ Forward DELETE method
+
+        :param url: URL address
+        :param params: URL parameters
+        :return: Request response
+        """
+        response = requests.delete(url, auth=self._get_authentication(), params=params)
+        if not response.ok:
+            self._raise_error("Could not DELETE", response)
+        return self._add_status_code(response)

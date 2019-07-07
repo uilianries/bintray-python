@@ -169,6 +169,27 @@ class Bintray(object):
         url = "{}/users/{}/licenses/{}".format(Bintray.BINTRAY_URL, user, custom_license_name)
         return self._requester.patch(url, json=license)
 
+    def delete_org_proprietary_license(self, org, custom_license_name):
+        """ Delete a license associated with an organization.
+            For organization, caller must be an admin of the organization.
+
+        :param org: Organization name
+        :param custom_license_name: License name to be deleted
+        :return: request answer
+        """
+        url = "{}/orgs/{}/licenses/{}".format(Bintray.BINTRAY_URL, org, custom_license_name)
+        return self._requester.delete(url)
+
+    def delete_user_proprietary_license(self, user, custom_license_name):
+        """ Delete a license associated with an user.
+
+        :param user: User name
+        :param custom_license_name: License to be deleted
+        :return: request answer
+        """
+        url = "{}/users/{}/licenses/{}".format(Bintray.BINTRAY_URL, user, custom_license_name)
+        return self._requester.patch(url)
+
     def get_oss_licenses(self):
         """ Returns a list of all the OSS licenses.
 
