@@ -89,3 +89,24 @@ def test_update_user_proprietary_licenses():
 
     assert "Could not PATCH (405): 405 Client Error: Method Not Allowed for url: " \
            "https://api.bintray.com/users/uilianries/licenses/foobar"
+
+
+def test_delete_org_proprietary_licenses():
+    bintray = Bintray()
+    error_message = ""
+    try:
+        bintray.delete_org_proprietary_license(org="jfrog", custom_license_name="foobar")
+    except Exception as error:
+        error_message = str(error)
+    assert "Could not DELETE (403): 403 Client Error: Forbidden for url: " \
+           "https://api.bintray.com/orgs/jfrog/licenses/foobar"
+
+def test_delete_user_proprietary_licenses():
+    bintray = Bintray()
+    error_message = ""
+    try:
+        bintray.delete_user_proprietary_license(user="uilianries", custom_license_name="foobar")
+    except Exception as error:
+        error_message = str(error)
+    assert "Could not DELETE (403): 403 Client Error: Forbidden for url: " \
+           "https://api.bintray.com/users/uilianries/licenses/foobar"
