@@ -55,6 +55,37 @@ class Bintray(object):
                                                                 include_unpublished)
         return self._requester.get(url, parameters)
 
+    def get_version_files(self, subject, repo, package, version, include_unpublished=False):
+        """ Get all files in a given version.
+
+            Returns an array of results, where elements are similar to the result of getting
+            package files.
+
+            When called by a user with publishing rights on the package, includes unpublished
+            files in the list.
+
+            By default only published files are shown.
+
+            Security: Authenticated user with 'read' permission for private repositories,
+            or version read entitlement.
+
+        :param subject: username or organization
+        :param repo: repository name
+        :param package: package name
+        :param version: package version
+        :param include_unpublished: Show not published files
+        :return: List with all files
+        """
+        parameters = {"include_unpublished": bool_to_number(include_unpublished)}
+        url = "{}/packages/{}/{}/{}/versions/{}/files?include_unpublished={}".format(
+                                                                Bintray.BINTRAY_URL,
+                                                                subject,
+                                                                repo,
+                                                                package,
+                                                                version,
+                                                                include_unpublished)
+        return self._requester.get(url, parameters)
+
     # Content Uploading & Publishing
 
     def upload_content(self, subject, repo, package, version, remote_file_path, local_file_path,
