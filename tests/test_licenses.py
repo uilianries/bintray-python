@@ -63,3 +63,29 @@ def test_create_user_proprietary_licenses():
         error_message = str(error)
     assert "Could not POST (400): 400 Client Error: Bad Request for url: " \
             "https://api.bintray.com/users/uilianries/licenses" == error_message
+
+
+def test_update_org_proprietary_licenses():
+    bintray = Bintray()
+    error_message = ""
+    try:
+        bintray.update_org_proprietary_license(org="jfrog", custom_license_name="foobar",
+                                               license=[{}])
+    except Exception as error:
+        error_message = str(error)
+
+    assert "Could not PATCH (405): 405 Client Error: Method Not Allowed for url: " \
+           "https://api.bintray.com/orgs/jfrog/licenses/foobar"
+
+
+def test_update_user_proprietary_licenses():
+    bintray = Bintray()
+    error_message = ""
+    try:
+        bintray.update_user_proprietary_license(user="uilianries", custom_license_name="foobar",
+                                               license=[{}])
+    except Exception as error:
+        error_message = str(error)
+
+    assert "Could not PATCH (405): 405 Client Error: Method Not Allowed for url: " \
+           "https://api.bintray.com/users/uilianries/licenses/foobar"
