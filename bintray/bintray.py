@@ -1,13 +1,13 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """ Python Wrapper for Bintray API
 
     https://bintray.com/docs/api
 """
 import os
-import logging
-import requests
-from requests.auth import HTTPBasicAuth
+
+from bintray.requester import Requester
+from bintray.logger import Logger
+from bintray.utils import bool_to_number
 
 
 __version__ = "0.1.1"
@@ -31,52 +31,8 @@ class Bintray(object):
         """
         self._username = username or os.getenv("BINTRAY_USERNAME")
         self._password = api_key or os.getenv("BINTRAY_API_KEY")
-
-        self._logger = logging.getLogger(__file__)
-        self._logger.setLevel(logging.INFO)
-        formatter = logging.Formatter('%(asctime)s:%(levelname)s: %(message)s')
-        ch = logging.StreamHandler()
-        level = int(os.getenv("BINTRAY_LOGGING_LEVEL", logging.INFO))
-        ch.setLevel(level)
-        ch.setFormatter(formatter)
-        self._logger.addHandler(ch)
-
-    def _get_authentication(self):
-        """ Retrieve Basic HTTP Authentication based on username and API key
-
-        :return: Basic Authentication handler
-        """
-        if not self._username or not self._password:
-            return None
-        return HTTPBasicAuth(self._username, self._password)
-
-    def _add_status_code(self, response):
-        """ Update JSON result with error and status code
-
-        :param response: Requests response
-        :return: Response JSON
-        """
-        json_data = response.json()
-        if isinstance(json_data, list):
-            json_data.append({"statusCode": response.status_code, "error": not response.ok})
-        else:
-            json_data.update({"statusCode": response.status_code, "error": not response.ok})
-        return json_data
-
-
-    def _bool_to_number(self, value):
-        """ Convert boolean result into numeric string
-
-        :param value: Any boolean value
-        :return: "1" when True. Otherwise, "0"
-        """
-        return "1" if value else "0"
-
-    def _raise_error(self, message, response):
-        try:
-            response.raise_for_status()
-        except Exception as error:
-            raise Exception("{} ({}): {}".format(message, response.status_code, str(error)))
+        self._requester = Requester(self._username, self._password)
+        self._logger = Logger().logger
 
     # Files
 
@@ -91,16 +47,13 @@ class Bintray(object):
         :param include_unpublished: Show not published files
         :return: List with all files
         """
-        parameters = {"include_unpublished": self._bool_to_number(include_unpublished)}
+        parameters = {"include_unpublished": bool_to_number(include_unpublished)}
         url = "{}/packages/{}/{}/{}/files?include_unpublished={}".format(Bintray.BINTRAY_URL,
                                                                 subject,
                                                                 repo,
                                                                 package,
                                                                 include_unpublished)
-        response = requests.get(url, auth=self._get_authentication(), params=parameters)
-        if not response.ok:
-            self._raise_error("Could not list package files", response)
-        return self._add_status_code(response)
+        return self._requester.get(url, parameters)
 
     # Content Uploading & Publishing
 
@@ -122,17 +75,15 @@ class Bintray(object):
         """
         url = "{}/content/{}/{}/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, package,
                                                  version, remote_file_path)
-        parameters = {"publish": self._bool_to_number(publish),
-                      "override": self._bool_to_number(override),
-                      "explode": self._bool_to_number(explode)}
+        parameters = {"publish": bool_to_number(publish),
+                      "override": bool_to_number(override),
+                      "explode": bool_to_number(explode)}
 
         with open(local_file_path, 'rb') as file_content:
-            response = requests.put(url, auth=self._get_authentication(), params=parameters,
-                                    data=file_content)
-            if response.status_code != 201:
-                self._raise_error("Could not upload", response)
+            response = self._requester.put(url, params=parameters, data=file_content)
+
         self._logger.info("Upload successfully: {}".format(url))
-        return self._add_status_code(response)
+        return response
 
     # Content Downloading
 
@@ -146,10 +97,103 @@ class Bintray(object):
         """
         download_base_url = "https://dl.bintray.com"
         url = "{}/{}/{}/{}".format(download_base_url, subject, repo, remote_file_path)
-        response = requests.get(url, auth=self._get_authentication())
-        if not response.ok:
-            self._raise_error("Could not download file content", response)
+        response, content = self._requester.download(url)
+
         with open(local_file_path, 'wb') as local_fd:
-            local_fd.write(response.content)
+            local_fd.write(content)
+
         self._logger.info("Download successfully: {}".format(url))
-        return self._add_status_code(response)
+        return response
+
+    # Licenses
+
+    def get_org_proprietary_licenses(self, org):
+        """ Get a list of custom, proprietary licenses associated with an organization
+
+        :param org: Organization name
+        :return: Licenses list
+        """
+        url = "{}/orgs/{}/licenses".format(Bintray.BINTRAY_URL, org)
+        return self._requester.get(url)
+
+    def get_user_proprietary_licenses(self, user):
+        """ Get a list of custom, proprietary licenses associated with an user
+
+        :param user: User name
+        :return: Licenses list
+        """
+        url = "{}/users/{}/licenses".format(Bintray.BINTRAY_URL, user)
+        return self._requester.get(url)
+
+    def create_org_proprietary_license(self, org, license):
+        """ Create a license associated with an organization.
+            Caller must be an admin of the organization.
+
+        :param org: Organization name
+        :param license: JSON data with license information
+        :return: request answer
+        """
+        url = "{}/orgs/{}/licenses".format(Bintray.BINTRAY_URL, org)
+        return self._requester.post(url, json=license)
+
+    def create_user_proprietary_license(self, user, license):
+        """ Create a license associated with an user.
+
+        :param user: User name
+        :param license: JSON data with license information
+        :return: request answer
+        """
+        url = "{}/users/{}/licenses".format(Bintray.BINTRAY_URL, user)
+        return self._requester.post(url, json=license)
+
+    def update_org_proprietary_license(self, org, custom_license_name, license):
+        """ Update a license associated with an organization.
+            Caller must be an admin of the organization.
+
+        :param org: Organization name
+        :param custom_license_name: License to be updated
+        :param license: JSON data with license information
+        :return: request answer
+        """
+        url = "{}/orgs/{}/licenses/{}".format(Bintray.BINTRAY_URL, org, custom_license_name)
+        return self._requester.patch(url, json=license)
+
+    def update_user_proprietary_license(self, user, custom_license_name, license):
+        """ Update a license associated with an user.
+
+        :param user: User name
+        :param custom_license_name: License to be updated
+        :param license: JSON data with license information
+        :return: request answer
+        """
+        url = "{}/users/{}/licenses/{}".format(Bintray.BINTRAY_URL, user, custom_license_name)
+        return self._requester.patch(url, json=license)
+
+    def delete_org_proprietary_license(self, org, custom_license_name):
+        """ Delete a license associated with an organization.
+            For organization, caller must be an admin of the organization.
+
+        :param org: Organization name
+        :param custom_license_name: License name to be deleted
+        :return: request answer
+        """
+        url = "{}/orgs/{}/licenses/{}".format(Bintray.BINTRAY_URL, org, custom_license_name)
+        return self._requester.delete(url)
+
+    def delete_user_proprietary_license(self, user, custom_license_name):
+        """ Delete a license associated with an user.
+
+        :param user: User name
+        :param custom_license_name: License to be deleted
+        :return: request answer
+        """
+        url = "{}/users/{}/licenses/{}".format(Bintray.BINTRAY_URL, user, custom_license_name)
+        return self._requester.patch(url)
+
+    def get_oss_licenses(self):
+        """ Returns a list of all the OSS licenses.
+
+        :return: List with OSS licenses
+        """
+        url = "{}/licenses/oss_licenses".format(Bintray.BINTRAY_URL)
+        return self._requester.get(url)
