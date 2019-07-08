@@ -144,7 +144,7 @@ class Bintray(object):
         url = "{}/search/file".format(Bintray.BINTRAY_URL)
         return self._requester.get(url, parameters)
 
-    def file_in_download_list(self, subject, repo, file_path, add_or_remove=True):
+    def file_in_download_list(self, subject, repo, file_path, add_or_remove):
         """ Add or remove a file from/to the 'Download List'.
 
             Security: Authenticated user with 'publish' permission,
