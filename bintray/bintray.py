@@ -51,8 +51,7 @@ class Bintray(object):
         url = "{}/packages/{}/{}/{}/files".format(Bintray.BINTRAY_URL,
                                                   subject,
                                                   repo,
-                                                  package,
-                                                  include_unpublished)
+                                                  package)
         return self._requester.get(url, parameters)
 
     def get_version_files(self, subject, repo, package, version, include_unpublished=False):
@@ -81,8 +80,7 @@ class Bintray(object):
                                                               subject,
                                                               repo,
                                                               package,
-                                                              version,
-                                                              include_unpublished)
+                                                              version)
         return self._requester.get(url, parameters)
 
     def file_search_by_name(self, name, subject=None, repo=None, start_pos=None,
@@ -104,7 +102,37 @@ class Bintray(object):
         :param created_after: Creation date to filter
         :return: Package found. Otherwise, error.
         """
-        parameters = {}
+        parameters = {"name": name}
+        if subject:
+            parameters["subject"] = str(subject)
+        if repo:
+            parameters["repo"] = str(repo)
+        if start_pos:
+            parameters["start_pos"] = str(start_pos)
+        if created_after:
+            parameters["created_after"] = str(created_after)
+        url = "{}/search/file".format(Bintray.BINTRAY_URL)
+        return self._requester.get(url, parameters)
+
+    def file_search_by_checksum(self, sha1, subject=None, repo=None, start_pos=None,
+                            created_after=None):
+        """ Search for a file by its sha1 checksum.
+
+            May take an optional subject and/or repo name to search in.
+
+            Returns an array of results, where elements are similar to the result of getting
+            package files. Search results will not contain private files.
+
+            Security: Authentication is not required
+
+        :param sha1: File SHA-1
+        :param subject: File subject to filter
+        :param repo: File repo filter
+        :param start_pos: Start position name to filter
+        :param created_after: Creation date to filter
+        :return: Package found. Otherwise, error.
+        """
+        parameters = {"sha1": sha1}
         if subject:
             parameters["subject"] = str(subject)
         if repo:
