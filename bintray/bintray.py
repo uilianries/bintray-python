@@ -144,6 +144,23 @@ class Bintray(object):
         url = "{}/search/file".format(Bintray.BINTRAY_URL)
         return self._requester.get(url, parameters)
 
+    def file_in_download_list(self, subject, repo, file_path, add_or_remove=True):
+        """ Add or remove a file from/to the 'Download List'.
+
+            Security: Authenticated user with 'publish' permission,
+                      or version read/write entitlement.
+
+        :param subject: File subject to filter
+        :param repo: File repo filter
+        :param file_path: File path to be added or removed
+        :param add_or_remove: True to add in Download list. False to remove.
+        :return: Request response.
+        """
+        action = 'true' if add_or_remove else 'false'
+        json_data = {'list_in_downloads': action}
+        url = "{}/file_metadata/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, file_path)
+        return self._requester.put(url, json=json_data)
+
     # Content Uploading & Publishing
 
     def upload_content(self, subject, repo, package, version, remote_file_path, local_file_path,
