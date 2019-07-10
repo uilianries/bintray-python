@@ -294,7 +294,7 @@ class Bintray(object):
         :return: request answer
         """
         url = "{}/users/{}/licenses/{}".format(Bintray.BINTRAY_URL, user, custom_license_name)
-        return self._requester.patch(url)
+        return self._requester.delete(url)
 
     def get_oss_licenses(self):
         """ Returns a list of all the OSS licenses.
