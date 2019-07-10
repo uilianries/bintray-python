@@ -114,4 +114,3 @@ def test_file_in_download_list():
     bintray = Bintray()
     response = bintray.file_in_download_list("uilianries", "generic", "packages.json", True)
     assert {'error': False, 'message': 'success', 'statusCode': 200} == response
-
