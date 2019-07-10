@@ -11,7 +11,4 @@ if [[ "$(uname -s)" == 'Darwin' ]]; then
 fi
 
 python setup.py sdist
-pushd tests
-pytest -v -s --cov=bintray
-mv .coverage ..
-popd
+pytest -v -s --cov=bintray tests
