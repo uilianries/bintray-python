@@ -211,6 +211,63 @@ class Bintray(object):
         self._logger.info("Download successfully: {}".format(url))
         return response
 
+    def dynamic_download(self, subject, repo, remote_file_path, local_file_path, bt_package=None):
+        """ Download a file based on a dynamic file_path .
+
+            This resource is only available for Bintray Premium repositories.
+
+            Currently, only the $latest token is supported, which is useful for downloading the
+            latest file published under a specified package.
+
+            Package name can be supplied as a:
+                The bt_package query parameter
+                The bt_package matrix parameter
+                The X-Bintray-Package request header
+
+            A successful call will return a 302 redirect to a generated signed URL
+            (with 15 second expiry) to the resolved file path.
+
+        :param subject: username or organization
+        :param repo: repository name
+        :param remote_file_path: file name to be downloaded from Bintray
+        :param local_file_path: file name to be stored in local storage
+        :param bt_package: query parameter
+        """
+
+        parameters = {"bt_package": bt_package} if bt_package else None
+        download_base_url = "https://dl.bintray.com"
+        url = "{}/{}/{}/{}".format(download_base_url, subject, repo, remote_file_path)
+        response, content = self._requester.download(url, params=parameters)
+
+        with open(local_file_path, 'wb') as local_fd:
+            local_fd.write(content)
+
+        self._logger.info("Download successfully: {}".format(url))
+        return response
+
+    def url_signing(self, subject, repo, file_path, json_data, encrypt=False):
+        """ Generates an anonymous, signed download URL with an expiry date.
+
+            Caller must be an owner of the repository or a publisher in the organization owning
+            the repository.
+
+            Encrypted download is possible - encryption will be done using AES 256 CBC, see below
+            documentation.
+
+            This resource is only available to Bintray Premium users.
+
+        :param subject: username or organization
+        :param repo: repository name
+        :param file_path: signed path
+        :param json_data: URL data
+        :param encrypt: encrypted download
+        """
+
+        parameters = {"encrypt": str(encrypt).lower()}
+        url = "{}/signed_url/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, file_path)
+        response = self._requester.post(url, json=json_data, params=parameters)
+        return response
+
     # Licenses
 
     def get_org_proprietary_licenses(self, org):
