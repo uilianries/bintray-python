@@ -177,13 +177,37 @@ class Bintray(object):
         :param publish: publish after uploading
         :param override: override remote file
         :param explode: explode remote file
-        :return:
+        :return: Request response
         """
         url = "{}/content/{}/{}/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, package,
                                                  version, remote_file_path)
         parameters = {"publish": bool_to_number(publish),
                       "override": bool_to_number(override),
                       "explode": bool_to_number(explode)}
+
+        with open(local_file_path, 'rb') as file_content:
+            response = self._requester.put(url, params=parameters, data=file_content)
+
+        self._logger.info("Upload successfully: {}".format(url))
+        return response
+
+    def maven_upload(self, subject, repo, package, remote_file_path, local_file_path, publish=True):
+        """ Upload Maven artifacts to the specified repository path, with package information.
+
+            Version information is resolved from the path, which is expected to follow the Maven
+            layout.
+
+        :param subject: username or organization
+        :param repo: repository name
+        :param package: package name
+        :param remote_file_path: file name to be used on Bintray
+        :param local_file_path: file path to be uploaded
+        :param publish: publish after uploading
+        :return: Request response
+        """
+        url = "{}/maven/{}/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, package,
+                                            remote_file_path)
+        parameters = {"publish": bool_to_number(publish)}
 
         with open(local_file_path, 'rb') as file_content:
             response = self._requester.put(url, params=parameters, data=file_content)
