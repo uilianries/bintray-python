@@ -66,21 +66,24 @@ class Requester(object):
             self._raise_error("Could not GET", response)
         return self._add_status_code(response), response.content
 
-    def put(self, url, params=None, data=None, json=None):
+    def put(self, url, params=None, data=None, json=None, headers=None):
         """ Forward PUT method
 
         :param url: URL address
         :param params: URL params
         :param data: Data content
         :param json: JSON content
+        :param headers: Request headers
         :return: JSON
         """
         if data and json:
             raise Exception("Only accept 'data' or 'json'")
         if data:
-            response = requests.put(url, auth=self._get_authentication(), params=params, data=data)
+            response = requests.put(url, auth=self._get_authentication(), params=params, data=data,
+                                    headers=headers)
         else:
-            response = requests.put(url, auth=self._get_authentication(), params=params, json=json)
+            response = requests.put(url, auth=self._get_authentication(), params=params, json=json,
+                                    headers=headers)
         if not response.ok:
             self._raise_error("Could not PUT", response)
         return self._add_status_code(response)

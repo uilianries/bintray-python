@@ -191,11 +191,14 @@ class Bintray(object):
         self._logger.info("Upload successfully: {}".format(url))
         return response
 
-    def maven_upload(self, subject, repo, package, remote_file_path, local_file_path, publish=True):
+    def maven_upload(self, subject, repo, package, remote_file_path, local_file_path, publish=True,
+                     passphrase=None):
         """ Upload Maven artifacts to the specified repository path, with package information.
 
             Version information is resolved from the path, which is expected to follow the Maven
             layout.
+
+            You may supply a passphrase for signing uploaded files using the X-GPG-PASSPHRASE header
 
         :param subject: username or organization
         :param repo: repository name
@@ -203,14 +206,17 @@ class Bintray(object):
         :param remote_file_path: file name to be used on Bintray
         :param local_file_path: file path to be uploaded
         :param publish: publish after uploading
+        :param passphrase: GPG passphrase
         :return: Request response
         """
         url = "{}/maven/{}/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, package,
                                             remote_file_path)
         parameters = {"publish": bool_to_number(publish)}
+        headers = {"X-GPG-PASSPHRASE": passphrase} if passphrase else None
 
         with open(local_file_path, 'rb') as file_content:
-            response = self._requester.put(url, params=parameters, data=file_content)
+            response = self._requester.put(url, params=parameters, data=file_content,
+                                           headers=headers)
 
         self._logger.info("Upload successfully: {}".format(url))
         return response
