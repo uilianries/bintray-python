@@ -88,15 +88,17 @@ class Requester(object):
             self._raise_error("Could not PUT", response)
         return self._add_status_code(response)
 
-    def post(self, url, json=None, params=None):
+    def post(self, url, json=None, params=None, headers=None):
         """ Forward POST method
 
         :param url: URL address
         :param params: URL parameters
         :param json: Data to be posted
+        :param headers: Request headers
         :return: Request response
         """
-        response = requests.post(url, auth=self._get_authentication(), json=json, params=params)
+        response = requests.post(url, auth=self._get_authentication(), json=json, params=params,
+                                 headers=headers)
         if not response.ok:
             self._raise_error("Could not POST", response)
         return self._add_status_code(response)

@@ -261,6 +261,70 @@ class Bintray(object):
         self._logger.info("Upload successfully: {}".format(url))
         return response
 
+    def _publish_discard_uploaded_content(self, subject, repo, package, version, discard=False,
+                                          publish_wait_for_secs=-1, passphrase=None):
+        """ Asynchronously publishes all unpublished content for a user’s package version. Returns
+            the number of to-be-published files.
+
+            In order to wait for publishing to finish and run this call synchronously, specify a
+            "publish_wait_for_secs" timeout in seconds. To wait for the maximum timeout allowed by
+            Bintray use a wait value of -1 . A wait value of 0 is the default and is the same as
+            running this call asynchronously without waiting.
+
+            Optionally, pass in a "discard" flag to discard any unpublished content, instead of
+            publishing.
+
+            Automatic Signing for Repository Metadata
+
+            For repositories that support automatic calculation of repository metadata (such as
+            Debian and YUM), you may supply signing required information.
+
+        :param subject: username or organization
+        :param repo: repository name
+        :param package: package name
+        :param version: package version
+        :param discard: Discard package
+        :param publish_wait_for_secs: Publishing timeout
+        :param passphrase: GPG passphrase
+        :return: Request response
+        """
+        url = "{}/content/{}/{}/{}/{}/publish".format(Bintray.BINTRAY_URL, subject, repo, package,
+                                                      version)
+        body = {'discard': discard,
+                'publish_wait_for_secs': publish_wait_for_secs}
+        headers = {"X-GPG-PASSPHRASE": passphrase} if passphrase else None
+
+        response = self._requester.post(url, json=body, headers=headers)
+
+        self._logger.info("Publish/Discard successfully: {}".format(url))
+        return response
+
+    def publish_uploaded_content(self, subject, repo, package, version, passphrase=None):
+        """ Asynchronously publishes all unpublished content for a user’s package version.
+
+        :param subject: username or organization
+        :param repo: repository name
+        :param package: package name
+        :param version: package version
+        :param passphrase: GPG passphrase
+        :return: the number of to-be-published files.
+        """
+        return self._publish_discard_uploaded_content(subject, repo, package, version,
+                                                      discard=False, passphrase=passphrase)
+
+    def discard_uploaded_content(self, subject, repo, package, version, passphrase=None):
+        """ Asynchronously discard all unpublished content for a user’s package version.
+
+        :param subject: username or organization
+        :param repo: repository name
+        :param package: package name
+        :param version: package version
+        :param passphrase: GPG passphrase
+        :return: the number of discarded files.
+        """
+        return self._publish_discard_uploaded_content(subject, repo, package, version,
+                                                      discard=True, passphrase=passphrase)
+
     # Content Downloading
 
     def download_content(self, subject, repo, remote_file_path, local_file_path):
