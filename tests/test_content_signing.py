@@ -25,3 +25,10 @@ def test_gpg_sign_version():
     response = bintray.gpg_sign_version("uilianries", "generic", "statistics", "test")
     assert {'error': False, 'message': 'success', 'statusCode': 200} == response or \
            {'error': False, 'message': 'success', 'statusCode': 201} == response
+
+
+def test_gpg_sign_file():
+    bintray = Bintray()
+    response = bintray.gpg_sign_file("uilianries", "generic", "packages.json")
+    assert {'error': False, 'message': 'success', 'statusCode': 200} == response or \
+           {'error': False, 'message': 'success', 'statusCode': 201} == response

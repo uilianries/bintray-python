@@ -576,3 +576,37 @@ class Bintray(object):
 
         self._logger.info("Sign successfully: {}".format(url))
         return response
+
+    def gpg_sign_file(self, subject, repo, file_path, key_subject=None, passphrase=None,
+                      key_path=None):
+        """ GPG sign the specified repository file.
+
+            GPG signing information may be needed
+
+        :param subject: username or organization
+        :param repo: repository name
+        :param file_path: file path to be signed
+        :param key_subject: Alternative Bintray subject for the GPG public key
+        :param passphrase: Optional private key passphrase, if required
+        :param key_path: Optional private key, if not stored in Bintray
+        :return: request response
+        """
+        url = "{}/gpg/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, file_path)
+        body = {}
+        if subject:
+            body['subject'] = key_subject
+        if passphrase:
+            body['passphrase'] = passphrase
+        if key_path:
+            with open(key_path, 'r') as fd:
+                body['private_key'] = fd.read()
+        body = None if body == {} else body
+        headers = None
+        if "passphrase" in body and len(body.keys()) == 1:
+            headers = {"X-GPG-PASSPHRASE": passphrase}
+            body = None
+
+        response = self._requester.post(url, json=body, headers=headers)
+
+        self._logger.info("Sign successfully: {}".format(url))
+        return response
