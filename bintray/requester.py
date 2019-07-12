@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import requests
+import json
 
 from requests.auth import HTTPBasicAuth
 
@@ -31,7 +32,10 @@ class Requester(object):
         :param response: Requests response
         :return: Response JSON
         """
-        json_data = response.json()
+        try:
+            json_data = response.json()
+        except json.decoder.JSONDecodeError:
+            json_data = {'message': response.content.decode()}
         if isinstance(json_data, list):
             json_data.append({"statusCode": response.status_code, "error": not response.ok})
         else:

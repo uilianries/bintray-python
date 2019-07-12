@@ -514,3 +514,99 @@ class Bintray(object):
         """
         url = "{}/licenses/oss_licenses".format(Bintray.BINTRAY_URL)
         return self._requester.get(url)
+
+    # Content Signing
+
+    def get_org_gpg_public_key(self, org):
+        """ Get the organization GPG public key.
+
+            The response Content-Type format is 'application/pgp-keys'.
+
+        :param org: Organization name
+        :return: response Content-Type format as 'application/pgp-keys'.
+        """
+        url = "{}/orgs/{}/keys/gpg/public.key".format(Bintray.BINTRAY_URL, org)
+        return self._requester.get(url)
+
+    def get_user_gpg_public_key(self, user):
+        """ Get the subject GPG public key.
+
+            The response Content-Type format is 'application/pgp-keys'.
+
+        :param org: Organization name
+        :return: response Content-Type format as 'application/pgp-keys'.
+        """
+        url = "{}/users/{}/keys/gpg/public.key".format(Bintray.BINTRAY_URL, user)
+        return self._requester.get(url)
+
+    def gpg_sign_version(self, subject, repo, package, version, key_subject=None, passphrase=None,
+                         key_path=None):
+        """ GPG sign all files associated with the specified version.
+
+            GPG signing information may be needed
+
+            Security: Authenticated user with 'publish' permission.
+
+        :param subject: username or organization
+        :param repo: repository name
+        :param package: package name
+        :param version: package version
+        :param key_subject: Alternative Bintray subject for the GPG public key
+        :param passphrase: Optional private key passphrase, if required
+        :param key_path: Optional private key, if not stored in Bintray
+        :return: request response
+        """
+        url = "{}/gpg/{}/{}/{}/versions/{}".format(Bintray.BINTRAY_URL, subject, repo, package,
+                                                   version)
+        body = {}
+        if subject:
+            body['subject'] = key_subject
+        if passphrase:
+            body['passphrase'] = passphrase
+        if key_path:
+            with open(key_path, 'r') as fd:
+                body['private_key'] = fd.read()
+        body = None if body == {} else body
+        headers = None
+        if "passphrase" in body and len(body.keys()) == 1:
+            headers = {"X-GPG-PASSPHRASE": passphrase}
+            body = None
+
+        response = self._requester.post(url, json=body, headers=headers)
+
+        self._logger.info("Sign successfully: {}".format(url))
+        return response
+
+    def gpg_sign_file(self, subject, repo, file_path, key_subject=None, passphrase=None,
+                      key_path=None):
+        """ GPG sign the specified repository file.
+
+            GPG signing information may be needed
+
+        :param subject: username or organization
+        :param repo: repository name
+        :param file_path: file path to be signed
+        :param key_subject: Alternative Bintray subject for the GPG public key
+        :param passphrase: Optional private key passphrase, if required
+        :param key_path: Optional private key, if not stored in Bintray
+        :return: request response
+        """
+        url = "{}/gpg/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, file_path)
+        body = {}
+        if subject:
+            body['subject'] = key_subject
+        if passphrase:
+            body['passphrase'] = passphrase
+        if key_path:
+            with open(key_path, 'r') as fd:
+                body['private_key'] = fd.read()
+        body = None if body == {} else body
+        headers = None
+        if "passphrase" in body and len(body.keys()) == 1:
+            headers = {"X-GPG-PASSPHRASE": passphrase}
+            body = None
+
+        response = self._requester.post(url, json=body, headers=headers)
+
+        self._logger.info("Sign successfully: {}".format(url))
+        return response
