@@ -514,3 +514,27 @@ class Bintray(object):
         """
         url = "{}/licenses/oss_licenses".format(Bintray.BINTRAY_URL)
         return self._requester.get(url)
+
+    # Content Signing
+
+    def get_org_gpg_public_key(self, org):
+        """ Get the organization GPG public key.
+
+            The response Content-Type format is 'application/pgp-keys'.
+
+        :param org: Organization name
+        :return: response Content-Type format as 'application/pgp-keys'.
+        """
+        url = "{}/orgs/{}/keys/gpg/public.key".format(Bintray.BINTRAY_URL, org)
+        return self._requester.get(url)
+
+    def get_user_gpg_public_key(self, user):
+        """ Get the subject GPG public key.
+
+            The response Content-Type format is 'application/pgp-keys'.
+
+        :param org: Organization name
+        :return: response Content-Type format as 'application/pgp-keys'.
+        """
+        url = "{}/users/{}/keys/gpg/public.key".format(Bintray.BINTRAY_URL, user)
+        return self._requester.get(url)
