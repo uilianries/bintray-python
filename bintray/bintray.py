@@ -165,8 +165,7 @@ class Bintray(object):
 
     def upload_content(self, subject, repo, package, version, remote_file_path, local_file_path,
                        publish=True, override=False, explode=False):
-        """
-        Upload content to the specified repository path, with package and version information (both required).
+        """ Upload content to the specified repository path, with package and version information.
 
         :param subject: username or organization
         :param repo: repository name
@@ -177,7 +176,7 @@ class Bintray(object):
         :param publish: publish after uploading
         :param override: override remote file
         :param explode: explode remote file
-        :return:
+        :return: Request response
         """
         url = "{}/content/{}/{}/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, package,
                                                  version, remote_file_path)
@@ -189,6 +188,161 @@ class Bintray(object):
             response = self._requester.put(url, params=parameters, data=file_content)
 
         self._logger.info("Upload successfully: {}".format(url))
+        return response
+
+    def maven_upload(self, subject, repo, package, remote_file_path, local_file_path, publish=True,
+                     passphrase=None):
+        """ Upload Maven artifacts to the specified repository path, with package information.
+
+            Version information is resolved from the path, which is expected to follow the Maven
+            layout.
+
+            You may supply a passphrase for signing uploaded files using the X-GPG-PASSPHRASE header
+
+        :param subject: username or organization
+        :param repo: repository name
+        :param package: package name
+        :param remote_file_path: file name to be used on Bintray
+        :param local_file_path: file path to be uploaded
+        :param publish: publish after uploading
+        :param passphrase: GPG passphrase
+        :return: Request response
+        """
+        url = "{}/maven/{}/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, package,
+                                            remote_file_path)
+        parameters = {"publish": bool_to_number(publish)}
+        headers = {"X-GPG-PASSPHRASE": passphrase} if passphrase else None
+
+        with open(local_file_path, 'rb') as file_content:
+            response = self._requester.put(url, params=parameters, data=file_content,
+                                           headers=headers)
+
+        self._logger.info("Upload successfully: {}".format(url))
+        return response
+
+    def debian_upload(self, subject, repo, package, version, remote_file_path, local_file_path,
+                      deb_distribution, deb_component, deb_architecture, publish=True,
+                      override=False, passphrase=None):
+        """ Upload Debian artifacts to the specified repository path, with package information.
+
+            When artifacts are uploaded to a Debian repository using the Automatic index layout,
+            the Debian distribution information is required and must be specified.
+
+        :param subject: username or organization
+        :param repo: repository name
+        :param package: package name
+        :param version: package version
+        :param remote_file_path: file name to be used on Bintray
+        :param local_file_path: file path to be uploaded
+        :param deb_distribution: Debian package distribution e.g. wheezy
+        :param deb_component: Debian package component e.g. main
+        :param deb_architecture: Debian package architecture e.g. i386,amd64
+        :param publish: publish after uploading
+        :param override: override remote file
+        :param passphrase: GPG passphrase
+        :return: Request response
+        """
+        url = "{}/content/{}/{}/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, package,
+                                                 version, remote_file_path)
+        parameters = {"publish": bool_to_number(publish),
+                      "override": bool_to_number(override)}
+        headers = {
+            "X-Bintray-Debian-Distribution": deb_distribution,
+            "X-Bintray-Debian-Component": deb_component,
+            "X-Bintray-Debian-Architecture": deb_architecture
+        }
+        if passphrase:
+            headers["X-GPG-PASSPHRASE"] = passphrase
+
+        with open(local_file_path, 'rb') as file_content:
+            response = self._requester.put(url, params=parameters, data=file_content,
+                                           headers=headers)
+
+        self._logger.info("Upload successfully: {}".format(url))
+        return response
+
+    def _publish_discard_uploaded_content(self, subject, repo, package, version, discard=False,
+                                          publish_wait_for_secs=-1, passphrase=None):
+        """ Asynchronously publishes all unpublished content for a user’s package version. Returns
+            the number of to-be-published files.
+
+            In order to wait for publishing to finish and run this call synchronously, specify a
+            "publish_wait_for_secs" timeout in seconds. To wait for the maximum timeout allowed by
+            Bintray use a wait value of -1 . A wait value of 0 is the default and is the same as
+            running this call asynchronously without waiting.
+
+            Optionally, pass in a "discard" flag to discard any unpublished content, instead of
+            publishing.
+
+            Automatic Signing for Repository Metadata
+
+            For repositories that support automatic calculation of repository metadata (such as
+            Debian and YUM), you may supply signing required information.
+
+        :param subject: username or organization
+        :param repo: repository name
+        :param package: package name
+        :param version: package version
+        :param discard: Discard package
+        :param publish_wait_for_secs: Publishing timeout
+        :param passphrase: GPG passphrase
+        :return: Request response
+        """
+        url = "{}/content/{}/{}/{}/{}/publish".format(Bintray.BINTRAY_URL, subject, repo, package,
+                                                      version)
+        body = {'discard': discard,
+                'publish_wait_for_secs': publish_wait_for_secs}
+        headers = {"X-GPG-PASSPHRASE": passphrase} if passphrase else None
+
+        response = self._requester.post(url, json=body, headers=headers)
+
+        self._logger.info("Publish/Discard successfully: {}".format(url))
+        return response
+
+    def publish_uploaded_content(self, subject, repo, package, version, passphrase=None):
+        """ Asynchronously publishes all unpublished content for a user’s package version.
+
+        :param subject: username or organization
+        :param repo: repository name
+        :param package: package name
+        :param version: package version
+        :param passphrase: GPG passphrase
+        :return: the number of to-be-published files.
+        """
+        return self._publish_discard_uploaded_content(subject, repo, package, version,
+                                                      discard=False, passphrase=passphrase)
+
+    def discard_uploaded_content(self, subject, repo, package, version, passphrase=None):
+        """ Asynchronously discard all unpublished content for a user’s package version.
+
+        :param subject: username or organization
+        :param repo: repository name
+        :param package: package name
+        :param version: package version
+        :param passphrase: GPG passphrase
+        :return: the number of discarded files.
+        """
+        return self._publish_discard_uploaded_content(subject, repo, package, version,
+                                                      discard=True, passphrase=passphrase)
+
+    def delete_content(self, subject, repo, file_path):
+        """ Delete content from the specified repository path,
+
+            Currently supports only deletion of files.
+            For OSS, this action is limited for 180 days from the content’s publish date.
+
+            Security: Authenticated user with 'publish' permission, or read/write entitlement for a
+            repository path
+
+        :param subject: username or organization
+        :param repo: repository name
+        :param file_path: file to be deleted
+        :return: request response
+        """
+        url = "{}/content/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, file_path)
+        response = self._requester.delete(url)
+
+        self._logger.info("Delete successfully: {}".format(url))
         return response
 
     # Content Downloading
