@@ -24,35 +24,3 @@ def test_bad_credentials_for_upload_content():
     assert "Could not PUT (401): 401 Client Error: Unauthorized for url: " \
            "https://api.bintray.com/content/uilianries/generic/statistics/test/test.txt?" \
            "publish=1&override=0&explode=0" == error_message
-
-
-def test_maven_upload():
-    bintray = Bintray()
-    _, temp_path = tempfile.mkstemp(suffix=".xml")
-    with open(temp_path, 'w') as fd:
-        fd.write("""<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-<modelVersion>4.0.0</modelVersion>
-
-<groupId>com.mycompany.app</groupId>
-<artifactId>my-app</artifactId>
-<version>1.0.0</version>
-
-<properties>
-<maven.compiler.source>1.7</maven.compiler.source>
-<maven.compiler.target>1.7</maven.compiler.target>
-</properties>
-
-<dependencies>
-<dependency>
-  <groupId>junit</groupId>
-  <artifactId>junit</artifactId>
-  <version>4.12</version>
-  <scope>test</scope>
-</dependency>
-</dependencies>
-</project>
-""")
-    response = bintray.maven_upload("uilianries", "maven", "test", "pom.xml", temp_path,
-                                    publish=True)
-    assert {'error': False, 'message': 'success', 'statusCode': 201} == response
