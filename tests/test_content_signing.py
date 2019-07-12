@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import os
 from bintray.bintray import Bintray
 
 
@@ -18,3 +19,9 @@ def test_get_user_gpg_public_key():
     assert response.get("statusCode") == 200
     assert "BEGIN PGP PUBLIC KEY BLOCK" in response.get("message")
 
+
+def test_gpg_sign_version():
+    bintray = Bintray()
+    response = bintray.gpg_sign_version("uilianries", "generic", "statistics", "test")
+    assert {'error': False, 'message': 'success', 'statusCode': 200} == response or \
+           {'error': False, 'message': 'success', 'statusCode': 201} == response
