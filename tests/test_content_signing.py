@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import os
 from bintray.bintray import Bintray
 
 

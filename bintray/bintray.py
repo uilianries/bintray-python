@@ -610,3 +610,39 @@ class Bintray(object):
 
         self._logger.info("Sign successfully: {}".format(url))
         return response
+
+    # Content Sync
+
+    def sync_version_artifacts_to_maven_central(self, subject, repo, package, version, username,
+                                                password, close="1"):
+        """ Sync version files to a oss.sonatype.org staging repository to publish these files to
+            Maven Central.
+
+            Once Sonatype oss credentials have been set in subject "Accounts" tab, user can send
+            this rest call without specifying username and password (or use different
+            username/password by specifying them in JSON body)
+
+            By default the staging repository is closed and artifacts are released to Maven Central.
+            You can optionally turn this behaviour off and release the version manually.
+            This is achieved by passing 0 in the 'close' field of the JSON passed to the call.
+
+            Security: Authenticated user with 'publish' permission.
+
+        :param subject: username or organization
+        :param repo: repository name
+        :param package: package name
+        :param version: package version
+        :param username: Sonatype OSS user token
+        :param password: Sonatype OSS user password
+        :param close: staging repository mode
+        :return: request response
+        """
+        url = "{}/maven_central_sync/{}/{}/{}/versions/{}".format(Bintray.BINTRAY_URL, subject,
+                                                                  repo, package, version)
+        body = {
+            'username': username,
+            'password': password,
+            'close': close
+        }
+
+        return self._requester.post(url, json=body)
