@@ -325,6 +325,26 @@ class Bintray(object):
         return self._publish_discard_uploaded_content(subject, repo, package, version,
                                                       discard=True, passphrase=passphrase)
 
+    def delete_content(self, subject, repo, file_path):
+        """ Delete content from the specified repository path,
+
+            Currently supports only deletion of files.
+            For OSS, this action is limited for 180 days from the content’s publish date.
+
+            Security: Authenticated user with 'publish' permission, or read/write entitlement for a
+            repository path
+
+        :param subject: username or organization
+        :param repo: repository name
+        :param file_path: file to be deleted
+        :return: request response
+        """
+        url = "{}/content/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, file_path)
+        response = self._requester.delete(url)
+
+        self._logger.info("Delete successfully: {}".format(url))
+        return response
+
     # Content Downloading
 
     def download_content(self, subject, repo, remote_file_path, local_file_path):
