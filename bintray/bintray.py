@@ -1086,7 +1086,7 @@ class Bintray(object):
         self._logger.info("Get successfully")
         return response
 
-    def create_version(self, subject, repo, package, name, description=None,
+    def create_version(self, subject, repo, package, version, description=None,
                        released=None, github_release_notes_file=None,
                        github_use_tag_release_notes=None, vcs_tag=None):
         """ Creates a new version in the specified package (user has to be owner of the package)
@@ -1097,7 +1097,7 @@ class Bintray(object):
         :param subject: repository owner
         :param repo: repository name
         :param package: package name
-        :param name: version name
+        :param version: version name
         :param description: version description
         :param released: release date ISO8601
         :param github_release_notes_file: file path for release notes e.g. RELEASE.txt
@@ -1106,7 +1106,7 @@ class Bintray(object):
         :return: request response
         """
         url = "{}/packages/{}/{}/{}/versions".format(Bintray.BINTRAY_URL, subject, repo, package)
-        json_data = {'name': name}
+        json_data = {'name': version}
         if isinstance(description, str):
             json_data["desc"] = description
         if isinstance(released, str):
@@ -1141,8 +1141,46 @@ class Bintray(object):
         self._logger.info("Delete successfully")
         return response
 
-    def update_versions(self):
-        pass
+    def update_version(self, subject, repo, package, version, description=None,
+                        github_release_notes_file=None, github_use_tag_release_notes=None,
+                        vcs_tag=None):
+        """ Update the information of the specified version
+
+            Security: Authenticated user with 'publish' permission, or package read/write
+                      entitlement.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param version: version name to be updated
+        :param description: version description
+        :param github_release_notes_file: file path for release notes e.g. RELEASE.txt
+        :param github_use_tag_release_notes: True when contain release notes file
+        :param vcs_tag: tag name in VCS
+        :return: request response
+        """
+        url = "{}/packages/{}/{}/{}/versions/{}".format(Bintray.BINTRAY_URL, subject, repo,
+                                                        package, version)
+        json_data = {}
+        if isinstance(description, str):
+            json_data["desc"] = description
+        if isinstance(github_release_notes_file, str):
+            json_data["github_release_notes_file"] = github_release_notes_file
+        if isinstance(github_use_tag_release_notes, bool):
+            json_data["github_use_tag_release_notes"] = github_use_tag_release_notes
+        if isinstance(vcs_tag, str):
+            json_data["vcs_tag"] = vcs_tag
+
+        if not json_data:
+            raise ValueError("At lease one parameter must be filled.")
+
+        response = self._requester.patch(url, json=json_data)
+        self._logger.info("Create successfully")
+        return response
+
+        # PATCH /packages/:subject/:repo/:package/versions/:version
+
+
 
     def version_for_file(self):
         pass

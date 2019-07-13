@@ -15,7 +15,7 @@ def create_version():
     PACKAGE_VERSION = now.strftime("%Y%m%d%H%M%S%f")
     released = now.strftime("%Y-%m-%d")
 
-    return bintray.create_version("uilianries", "generic", "statistics", name=PACKAGE_VERSION,
+    return bintray.create_version("uilianries", "generic", "statistics", version=PACKAGE_VERSION,
                                   released=released, vcs_tag="0.1.0")
 
 
@@ -37,4 +37,12 @@ def test_delete_version(create_version):
     bintray = Bintray()
     response = bintray.delete_version("uilianries", "generic", "statistics",
                                       version=PACKAGE_VERSION)
+    assert {'error': False, 'message': 'success', 'statusCode': 200} == response
+
+
+def test_update_version(create_version):
+    bintray = Bintray()
+    response = bintray.update_version("uilianries", "generic", "statistics",
+                                      version=PACKAGE_VERSION, description="foobar",
+                                      vcs_tag="0.1.1")
     assert {'error': False, 'message': 'success', 'statusCode': 200} == response
