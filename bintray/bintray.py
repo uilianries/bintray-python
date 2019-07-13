@@ -3,7 +3,6 @@
 
     https://bintray.com/docs/api
 """
-import json
 import os
 
 from bintray.requester import Requester
@@ -1066,3 +1065,36 @@ class Bintray(object):
         response = self._requester.delete(url)
         self._logger.info("Update successfully")
         return response
+
+    # Versions
+
+    def get_version(self, subject, repo, package, version="_latest", attribute_values=True):
+        """ Get general information about a specified version, or query for the latest version that
+            has at least one file published to it.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param version: package version
+        :param attribute_values: show attributes
+        :return: request response + package version information
+        """
+        url = "{}/packages/{}/{}/{}/versions/{}".format(Bintray.BINTRAY_URL, subject, repo,
+                                                        package, version)
+        params = {"attribute_values": bool_to_number(attribute_values)}
+        response = self._requester.get(url, params=params)
+        self._logger.info("Get successfully")
+        return response
+
+
+    def create_version(self):
+        pass
+
+    def delete_version(self):
+        pass
+
+    def update_versions(self):
+        pass
+
+    def version_for_file(self):
+        pass
