@@ -894,3 +894,19 @@ class Bintray(object):
         response = self._requester.post(url)
         self._logger.info("Schedule metadata successfully")
         return response
+
+    def get_geo_restrictions(self, subject, repo):
+        """ Get the list of countries which are defined in the 'black_list' or in the 'white_list'.
+
+            This feature is limited to users with Enterprise account.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :return: request response
+        """
+        url = "{}/repos/{}/{}/geo_restrictions".format(Bintray.BINTRAY_URL, subject, repo)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
