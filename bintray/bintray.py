@@ -646,3 +646,18 @@ class Bintray(object):
         }
 
         return self._requester.post(url, json=body)
+
+    # Repositories
+
+    def get_repositories(self, subject):
+        """ Get a list of repos writable by subject (personal or organizational)
+
+            Security: Authenticated user with 'read' permission for private repositories,
+                      or repository read entitlement.
+
+        :param subject: subject name
+        :return: A list of repositories
+        """
+        url = "{}/repos/{}".format(Bintray.BINTRAY_URL, subject)
+        return self._requester.get(url)
+
