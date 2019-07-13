@@ -939,3 +939,19 @@ class Bintray(object):
         response = self._requester.put(url, json=json_data)
         self._logger.put("Update successfully")
         return response
+
+    def delete_geo_restrictions(self, subject, repo):
+        """ Remove all the countries from the 'white_list' and 'black_list'.
+
+            This feature is limited to users with Enterprise account.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :return: request response
+        """
+        url = "{}/repos/{}/{}/geo_restrictions".format(Bintray.BINTRAY_URL, subject, repo)
+        response = self._requester.delete(url)
+        self._logger.put("Delete successfully")
+        return response

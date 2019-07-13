@@ -155,3 +155,14 @@ def test_update_geo_restrictions():
     except Exception as error:
         error_message = str(error)
     assert "The update can be done on one list only." == error_message
+
+
+def test_delete_geo_restrictions():
+    bintray = Bintray()
+    error_message = ""
+    try:
+        bintray.delete_geo_restrictions("uilianries", "generic")
+    except Exception as error:
+        error_message = str(error)
+    assert "Could not DELETE (403): 403 Client Error: Forbidden for url: " \
+           "https://api.bintray.com/repos/uilianries/generic/geo_restrictions" == error_message
