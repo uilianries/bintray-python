@@ -115,7 +115,7 @@ class Requester(object):
         :param json: Data to be patched
         :return: Request response
         """
-        response = requests.post(url, auth=self._get_authentication(), json=json, params=params)
+        response = requests.patch(url, auth=self._get_authentication(), json=json, params=params)
         if not response.ok:
             self._raise_error("Could not PATCH", response)
         return self._add_status_code(response)

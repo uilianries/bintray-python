@@ -685,12 +685,12 @@ class Bintray(object):
             GPG auto sign flags - they let you specify whether GPG signing should be applied to this
             repo. auto signing with gpg is disabled by default.
 
-        :param subject:
-        :param repo:
-        :param type:
-        :param private:
-        :param description:
-        :param labels:
+        :param subject: repository owner
+        :param repo: repository name
+        :param type: repository type
+        :param private: True to private repository (premium account). Otherwise, False.
+        :param description: repository description
+        :param labels: repository labels (tags)
         :param gpg_sign_metadata:  if set to true then the repo’s metadata will be automatically
                                    signed with Bintray GPG key.
         :param gpg_sign_files: if set to true then the repo’s files will be automatically signed
@@ -731,4 +731,58 @@ class Bintray(object):
 
         response = self._requester.post(url, json=json_data)
         self._logger.info("Repository {} created successfully".format(repo))
+        return response
+
+    def update_repository(self, subject, repo, business_unit=None, description=None, labels=None,
+                          gpg_sign_metadata=None, gpg_sign_files=None, gpg_use_owner_key=None,
+                          version_update_max_days=None):
+        """ Update a repository under the specified subject
+
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param description: repository description
+        :param labels: repository labels (tags)
+        :param gpg_sign_metadata:  if set to true then the repo’s metadata will be automatically
+                                   signed with Bintray GPG key.
+        :param gpg_sign_files: if set to true then the repo’s files will be automatically signed
+                               with Bintray GPG key.
+        :param gpg_use_owner_key: if set to true then the repo’s metadata and files will be signed
+                                  automatically with the owner’s GPG key. this flag cannot be set
+                                  true simultaneously with either of the bintray key falgs (files or
+                                  metadata). this flag can be set true only if the repo’s owner
+                                  supplied a private (and public) GPG key on his bintray profile.
+        :param business_unit:  can be associated to repositories allowing you to monitor overall
+                               usage per business unit.
+        :param version_update_max_days: Number of days after the version is published in which an
+                                        organization member can upload, override or delete files in
+                                        the version, delete the version or its package. After this
+                                        period these actions are not available to the member.
+                                        This does not apply to the Admin of the repository who can
+                                        make changes to the version at any time after it is published
+        :return: Request response
+        """
+        url = "{}/repos/{}/{}".format(Bintray.BINTRAY_URL, subject, repo)
+        json_data = {}
+
+        if isinstance(business_unit, str):
+            json_data["business_unit"] = business_unit
+        if isinstance(description, str):
+            json_data["desc"] = description
+        if isinstance(labels, list):
+            json_data["labels"] = labels
+        if isinstance(gpg_sign_metadata, bool):
+            json_data["gpg_sign_metadata"] = gpg_sign_metadata
+        if isinstance(gpg_sign_files, bool):
+            json_data["gpg_sign_files"] = gpg_sign_files
+        if isinstance(gpg_use_owner_key, bool):
+            json_data["gpg_use_owner_key"] = gpg_use_owner_key
+        if isinstance(version_update_max_days, int):
+            json_data["version_update_max_days"] = version_update_max_days
+
+        if not json_data:
+            raise ValueError("At lease one parameter must be filled.")
+
+        response = self._requester.patch(url, json=json_data)
+        self._logger.info("Repository {} updated successfully".format(repo))
         return response
