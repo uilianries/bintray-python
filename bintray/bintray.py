@@ -673,3 +673,62 @@ class Bintray(object):
         """
         url = "{}/repos/{}/{}".format(Bintray.BINTRAY_URL, subject, repo)
         return self._requester.get(url)
+
+    def create_repository(self, subject, repo, type, description, private=False, labels=None,
+                          gpg_sign_metadata=False, gpg_sign_files=False, gpg_use_owner_key=False,
+                          business_unit=None, version_update_max_days=None):
+        """ Create a repository under to the specified subject.
+
+            The possible types for a repository are: maven, debian, conan, rpm, docker, npm, opkg,
+            nuget, vagrant and generic (default).
+
+            GPG auto sign flags - they let you specify whether GPG signing should be applied to this
+            repo. auto signing with gpg is disabled by default.
+
+        :param subject:
+        :param repo:
+        :param type:
+        :param private:
+        :param description:
+        :param labels:
+        :param gpg_sign_metadata:  if set to true then the repo’s metadata will be automatically
+                                   signed with Bintray GPG key.
+        :param gpg_sign_files: if set to true then the repo’s files will be automatically signed
+                               with Bintray GPG key.
+        :param gpg_use_owner_key: if set to true then the repo’s metadata and files will be signed
+                                  automatically with the owner’s GPG key. this flag cannot be set
+                                  true simultaneously with either of the bintray key falgs (files or
+                                  metadata). this flag can be set true only if the repo’s owner
+                                  supplied a private (and public) GPG key on his bintray profile.
+        :param business_unit:  can be associated to repositories allowing you to monitor overall
+                               usage per business unit.
+        :param version_update_max_days: Number of days after the version is published in which an
+                                        organization member can upload, override or delete files in
+                                        the version, delete the version or its package. After this
+                                        period these actions are not available to the member.
+                                        This does not apply to the Admin of the repository who can
+                                        make changes to the version at any time after it is published
+        :return: Request response
+        """
+        assert isinstance(private, bool), "private must be a boolean value [True, False]"
+        url = "{}/repos/{}/{}".format(Bintray.BINTRAY_URL, subject, repo)
+        json_data = {
+            'name': repo,
+            'type': type,
+            'private': private,
+            'desc': description,
+            'gpg_sign_metadata': gpg_sign_metadata,
+            'gpg_sign_files': gpg_sign_files,
+            'gpg_use_owner_key': gpg_use_owner_key
+        }
+        if labels:
+            assert isinstance(labels, list), "labels must be a list e.g. ['label1', 'label2']"
+            json_data['labels'] = labels
+        if business_unit:
+            json_data['business_unit'] = business_unit
+        if isinstance(version_update_max_days, int) or version_update_max_days:
+            json_data['version_update_max_days'] = int(version_update_max_days)
+
+        response = self._requester.post(url, json=json_data)
+        self._logger.info("Repository {} created successfully".format(repo))
+        return response
