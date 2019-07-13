@@ -1122,9 +1122,24 @@ class Bintray(object):
         self._logger.info("Create successfully")
         return response
 
+    def delete_version(self, subject, repo, package, version):
+        """ Delete the specified version
 
-    def delete_version(self):
-        pass
+            Security: Authenticated user with 'publish' permission, or package read/write
+                      entitlement.
+
+        param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param version: version to be deleted
+        :return: request response
+        """
+        url = "{}/packages/{}/{}/{}/versions/{}".format(Bintray.BINTRAY_URL, subject, repo, package,
+                                                        version)
+
+        response = self._requester.delete(url)
+        self._logger.info("Delete successfully")
+        return response
 
     def update_versions(self):
         pass
