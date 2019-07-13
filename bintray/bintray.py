@@ -786,3 +786,15 @@ class Bintray(object):
         response = self._requester.patch(url, json=json_data)
         self._logger.info("Repository {} updated successfully".format(repo))
         return response
+
+    def delete_repository(self, subject, repo):
+        """ Delete the specified repository under the specified subject
+
+        :param subject: subject name
+        :param repo: repo name
+        :return: request response
+        """
+        url = "{}/repos/{}/{}".format(Bintray.BINTRAY_URL, subject, repo)
+        response = self._requester.delete(url)
+        self._logger.info("Repository {} deleted successfully".format(repo))
+        return response

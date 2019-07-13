@@ -55,3 +55,9 @@ def test_update_repo_empty(create_repo):
     except ValueError as error:
         error_message = str(error)
     assert "At lease one parameter must be filled." == error_message
+
+
+def test_delete_repo(create_repo):
+    bintray = Bintray()
+    response = bintray.delete_repository("uilianries", TEMPORARY_REPO)
+    assert {'error': False, 'statusCode': 200, 'message': 'success'} == response
