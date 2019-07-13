@@ -47,7 +47,8 @@ def test_create_org_proprietary_licenses():
     bintray = Bintray()
     error_message = ""
     try:
-        bintray.create_org_proprietary_license(org="jfrog", license=[{}])
+        bintray.create_org_proprietary_license(org="jfrog", name='foobar', description='foo',
+                                                url='https://opensource.org/licenses/MIT')
     except Exception as error:
         error_message = str(error)
     assert "Could not POST (403): 403 Client Error: Forbidden for url: " \
@@ -58,11 +59,12 @@ def test_create_user_proprietary_licenses():
     bintray = Bintray()
     error_message = ""
     try:
-        bintray.create_user_proprietary_license(user="uilianries", license=[{}])
+        bintray.create_user_proprietary_license(user="uilianries", name='foobar', description='foo',
+                                                url='https://opensource.org/licenses/MIT')
     except Exception as error:
         error_message = str(error)
     assert "Could not POST (400): 400 Client Error: Bad Request for url: " \
-            "https://api.bintray.com/users/uilianries/licenses" == error_message
+           "https://api.bintray.com/users/uilianries/licenses" == error_message
 
 
 def test_update_org_proprietary_licenses():
@@ -70,11 +72,12 @@ def test_update_org_proprietary_licenses():
     error_message = ""
     try:
         bintray.update_org_proprietary_license(org="jfrog", custom_license_name="foobar",
-                                               license=[{}])
+                                               description="MIT license",
+                                               url="https://opensource.org/licenses/MIT")
     except Exception as error:
         error_message = str(error)
 
-    assert "Could not PATCH (405): 405 Client Error: Method Not Allowed for url: " \
+    assert "Could not PATCH (403): 403 Client Error: Forbidden for url: " \
            "https://api.bintray.com/orgs/jfrog/licenses/foobar" == error_message
 
 
@@ -82,13 +85,15 @@ def test_update_user_proprietary_licenses():
     bintray = Bintray()
     error_message = ""
     try:
-        bintray.update_user_proprietary_license(user="uilianries", custom_license_name="foobar",
-                                               license=[{}])
+        bintray.update_user_proprietary_license(user="uilianries",
+                                                custom_license_name="foo",
+                                                description="MIT license",
+                                                url="https://opensource.org/licenses/MIT")
     except Exception as error:
         error_message = str(error)
 
-    assert "Could not PATCH (405): 405 Client Error: Method Not Allowed for url: " \
-           "https://api.bintray.com/users/uilianries/licenses/foobar" == error_message
+    assert "Could not PATCH (400): 400 Client Error: Bad Request for url: " \
+           "https://api.bintray.com/users/uilianries/licenses/foo" == error_message
 
 
 def test_delete_org_proprietary_licenses():

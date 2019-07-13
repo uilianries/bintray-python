@@ -3,6 +3,7 @@
 
     https://bintray.com/docs/api
 """
+import json
 import os
 
 from bintray.requester import Requester
@@ -442,49 +443,81 @@ class Bintray(object):
         url = "{}/users/{}/licenses".format(Bintray.BINTRAY_URL, user)
         return self._requester.get(url)
 
-    def create_org_proprietary_license(self, org, license):
+    def create_org_proprietary_license(self, org, name, description, url):
         """ Create a license associated with an organization.
             Caller must be an admin of the organization.
 
         :param org: Organization name
-        :param license: JSON data with license information
+        :param name: license name
+        :param description: license description
+        :param url: license url
         :return: request answer
         """
-        url = "{}/orgs/{}/licenses".format(Bintray.BINTRAY_URL, org)
-        return self._requester.post(url, json=license)
+        url_request = "{}/orgs/{}/licenses".format(Bintray.BINTRAY_URL, org)
+        json_data = {
+            'name': name,
+            'description': description,
+            'url': url
+        }
+        return self._requester.post(url_request, json=json_data)
 
-    def create_user_proprietary_license(self, user, license):
+    def create_user_proprietary_license(self, user, name, description, url):
         """ Create a license associated with an user.
 
         :param user: User name
-        :param license: JSON data with license information
-        :return: request answer
+        :param name: license name
+        :param description: license description
+        :param url: license url
+        :return: request response
         """
-        url = "{}/users/{}/licenses".format(Bintray.BINTRAY_URL, user)
-        return self._requester.post(url, json=license)
+        url_request = "{}/users/{}/licenses".format(Bintray.BINTRAY_URL, user)
+        json_data = {
+            'name': name,
+            'description': description,
+            'url': url
+        }
+        return self._requester.post(url_request, json=json_data)
 
-    def update_org_proprietary_license(self, org, custom_license_name, license):
+    def update_org_proprietary_license(self, org, custom_license_name, description=None, url=None):
         """ Update a license associated with an organization.
             Caller must be an admin of the organization.
 
         :param org: Organization name
         :param custom_license_name: License to be updated
-        :param license: JSON data with license information
+        :param description: license description
+        :param url: license url
         :return: request answer
         """
-        url = "{}/orgs/{}/licenses/{}".format(Bintray.BINTRAY_URL, org, custom_license_name)
-        return self._requester.patch(url, json=license)
+        request_url = "{}/orgs/{}/licenses/{}".format(Bintray.BINTRAY_URL, org, custom_license_name)
+        json_data = {}
+        if isinstance(description, str):
+            json_data["description"] = description
+        if isinstance(url, str):
+            json_data["url"] = url
+        return self._requester.patch(request_url, json=json_data)
 
-    def update_user_proprietary_license(self, user, custom_license_name, license):
+    def update_user_proprietary_license(self, user, custom_license_name, description=None,
+                                        url=None):
         """ Update a license associated with an user.
 
         :param user: User name
         :param custom_license_name: License to be updated
-        :param license: JSON data with license information
+        :param description: license description
+        :param url: license url
         :return: request answer
         """
-        url = "{}/users/{}/licenses/{}".format(Bintray.BINTRAY_URL, user, custom_license_name)
-        return self._requester.patch(url, json=license)
+        request_url = "{}/users/{}/licenses/{}".format(Bintray.BINTRAY_URL, user,
+                                                       custom_license_name)
+        json_data = {}
+        if isinstance(description, str):
+            json_data["description"] = description
+        if isinstance(url, str):
+            json_data["url"] = url
+
+        if not json_data:
+            raise ValueError("At lease one parameter must be filled.")
+
+        return self._requester.patch(request_url, json=json_data)
 
     def delete_org_proprietary_license(self, org, custom_license_name):
         """ Delete a license associated with an organization.
@@ -646,3 +679,390 @@ class Bintray(object):
         }
 
         return self._requester.post(url, json=body)
+
+    # Repositories
+
+    def get_repositories(self, subject):
+        """ Get a list of repos writable by subject (personal or organizational)
+
+            Security: Authenticated user with 'read' permission for private repositories,
+                      or repository read entitlement.
+
+        :param subject: subject name
+        :return: A list of repositories
+        """
+        url = "{}/repos/{}".format(Bintray.BINTRAY_URL, subject)
+        return self._requester.get(url)
+
+    def get_repository(self, subject, repo):
+        """ Get general information about a repository of the specified user
+
+            Security: Authenticated user with 'read' permission for private repositories,
+                      or repository read entitlement.
+
+        :param subject: Subject name
+        :param repo: Repository name
+        :return: Repository information
+        """
+        url = "{}/repos/{}/{}".format(Bintray.BINTRAY_URL, subject, repo)
+        return self._requester.get(url)
+
+    def create_repository(self, subject, repo, type, description, private=False, labels=None,
+                          gpg_sign_metadata=False, gpg_sign_files=False, gpg_use_owner_key=False,
+                          business_unit=None, version_update_max_days=None):
+        """ Create a repository under to the specified subject.
+
+            The possible types for a repository are: maven, debian, conan, rpm, docker, npm, opkg,
+            nuget, vagrant and generic (default).
+
+            GPG auto sign flags - they let you specify whether GPG signing should be applied to this
+            repo. auto signing with gpg is disabled by default.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param type: repository type
+        :param private: True to private repository (premium account). Otherwise, False.
+        :param description: repository description
+        :param labels: repository labels (tags)
+        :param gpg_sign_metadata:  if set to true then the repo’s metadata will be automatically
+                                   signed with Bintray GPG key.
+        :param gpg_sign_files: if set to true then the repo’s files will be automatically signed
+                               with Bintray GPG key.
+        :param gpg_use_owner_key: if set to true then the repo’s metadata and files will be signed
+                                  automatically with the owner’s GPG key. this flag cannot be set
+                                  true simultaneously with either of the bintray key falgs (files or
+                                  metadata). this flag can be set true only if the repo’s owner
+                                  supplied a private (and public) GPG key on his bintray profile.
+        :param business_unit:  can be associated to repositories allowing you to monitor overall
+                               usage per business unit.
+        :param version_update_max_days: Number of days after the version is published in which an
+                                        organization member can upload, override or delete files in
+                                        the version, delete the version or its package. After this
+                                        period these actions are not available to the member.
+                                        This does not apply to the Admin of the repository who can
+                                        make changes to the version at any time after it is published
+        :return: Request response
+        """
+        assert isinstance(private, bool), "private must be a boolean value [True, False]"
+        url = "{}/repos/{}/{}".format(Bintray.BINTRAY_URL, subject, repo)
+        json_data = {
+            'name': repo,
+            'type': type,
+            'private': private,
+            'desc': description,
+            'gpg_sign_metadata': gpg_sign_metadata,
+            'gpg_sign_files': gpg_sign_files,
+            'gpg_use_owner_key': gpg_use_owner_key
+        }
+        if labels:
+            assert isinstance(labels, list), "labels must be a list e.g. ['label1', 'label2']"
+            json_data['labels'] = labels
+        if business_unit:
+            json_data['business_unit'] = business_unit
+        if isinstance(version_update_max_days, int) or version_update_max_days:
+            json_data['version_update_max_days'] = int(version_update_max_days)
+
+        response = self._requester.post(url, json=json_data)
+        self._logger.info("Repository {} created successfully".format(repo))
+        return response
+
+    def update_repository(self, subject, repo, business_unit=None, description=None, labels=None,
+                          gpg_sign_metadata=None, gpg_sign_files=None, gpg_use_owner_key=None,
+                          version_update_max_days=None):
+        """ Update a repository under the specified subject
+
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param description: repository description
+        :param labels: repository labels (tags)
+        :param gpg_sign_metadata:  if set to true then the repo’s metadata will be automatically
+                                   signed with Bintray GPG key.
+        :param gpg_sign_files: if set to true then the repo’s files will be automatically signed
+                               with Bintray GPG key.
+        :param gpg_use_owner_key: if set to true then the repo’s metadata and files will be signed
+                                  automatically with the owner’s GPG key. this flag cannot be set
+                                  true simultaneously with either of the bintray key falgs (files or
+                                  metadata). this flag can be set true only if the repo’s owner
+                                  supplied a private (and public) GPG key on his bintray profile.
+        :param business_unit:  can be associated to repositories allowing you to monitor overall
+                               usage per business unit.
+        :param version_update_max_days: Number of days after the version is published in which an
+                                        organization member can upload, override or delete files in
+                                        the version, delete the version or its package. After this
+                                        period these actions are not available to the member.
+                                        This does not apply to the Admin of the repository who can
+                                        make changes to the version at any time after it is published
+        :return: Request response
+        """
+        url = "{}/repos/{}/{}".format(Bintray.BINTRAY_URL, subject, repo)
+        json_data = {}
+
+        if isinstance(business_unit, str):
+            json_data["business_unit"] = business_unit
+        if isinstance(description, str):
+            json_data["desc"] = description
+        if isinstance(labels, list):
+            json_data["labels"] = labels
+        if isinstance(gpg_sign_metadata, bool):
+            json_data["gpg_sign_metadata"] = gpg_sign_metadata
+        if isinstance(gpg_sign_files, bool):
+            json_data["gpg_sign_files"] = gpg_sign_files
+        if isinstance(gpg_use_owner_key, bool):
+            json_data["gpg_use_owner_key"] = gpg_use_owner_key
+        if isinstance(version_update_max_days, int):
+            json_data["version_update_max_days"] = version_update_max_days
+
+        if not json_data:
+            raise ValueError("At lease one parameter must be filled.")
+
+        response = self._requester.patch(url, json=json_data)
+        self._logger.info("Repository {} updated successfully".format(repo))
+        return response
+
+    def delete_repository(self, subject, repo):
+        """ Delete the specified repository under the specified subject
+
+        :param subject: subject name
+        :param repo: repo name
+        :return: request response
+        """
+        url = "{}/repos/{}/{}".format(Bintray.BINTRAY_URL, subject, repo)
+        response = self._requester.delete(url)
+        self._logger.info("Repository {} deleted successfully".format(repo))
+        return response
+
+    def search_repository(self, name=None, description=None):
+        """ Search for a repository.
+
+            At least one of the name and desc search fields need to be specified.
+
+            Returns an array of results, where elements are similar to the result of getting a
+            single repository.
+
+            Search results will not contain private repositories.
+
+            Security: Authenticated user is required
+
+        :param name: repository name
+        :param description: repository name
+        :return: request response
+        """
+        url = "{}/search/repos".format(Bintray.BINTRAY_URL)
+        params = {}
+        if name:
+            params["name"] = name
+        if description:
+            params["desc"] = description
+
+        if not params:
+            raise ValueError("At lease one parameter must be filled.")
+
+        response = self._requester.get(url, params=params)
+        self._logger.info("Repository {} searched successfully".format(params))
+        return response
+
+    def link_package(self, subject, repo, source_subject, source_repo, source_package,
+                     path_prefix=None):
+        """ Link the package source_package into the repo repository.
+
+            Caller must be an admin of the organization owning the repository.
+
+        :param subject: target subject name
+        :param repo: target subject repository
+        :param source_subject: source subject
+        :param source_repo: source repository
+        :param source_package: source package name
+        :param path_prefix: path to include the files from
+        :return: request response
+        """
+        url = "{}/repository/{}/{}/links/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo,
+                                                          source_subject, source_repo,
+                                                          source_package)
+        json_data = {"path_prefix": path_prefix} if path_prefix else None
+
+        response = self._requester.put(url, json=json_data)
+        self._logger.info("Link package successfully")
+        return response
+
+    def unlink_package(self, subject, repo, source_subject, source_repo, source_package):
+        """ Unlink the package source_package from the repo repository.
+
+            Caller must be an admin of the organization owning the repository.
+
+        :param subject: target subject name
+        :param repo: target subject repository
+        :param source_subject: source subject
+        :param source_repo: source repository
+        :param source_package: source package name
+        :return: request response
+        """
+        url = "{}/repository/{}/{}/links/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo,
+                                                          source_subject, source_repo,
+                                                          source_package)
+        response = self._requester.delete(url)
+        self._logger.info("Unlink package successfully")
+        return response
+
+    def schedule_metadata_calculation(self, subject, repo, path=None):
+        """ Schedule metadata (index) calculation for the specified repository.
+
+            For a Maven repository you need to specify the path in the repository for which the
+            metadata should be calculated. For an RPM repository, you need to specify the path
+            according to the repository 'YUM Metadata Folder Depth' field, if different from zero.
+            For other repository types the path is ignored.
+
+            Security: Authenticated user with 'publish' permission, or repository read/write
+            entitlement.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param path: path in the repository
+        :return: request response
+        """
+        url = "{}/calc_metadata/{}/{}".format(Bintray.BINTRAY_URL, subject, repo)
+        if path:
+            url += '/' + path
+
+        response = self._requester.post(url)
+        self._logger.info("Schedule metadata successfully")
+        return response
+
+    def get_geo_restrictions(self, subject, repo):
+        """ Get the list of countries which are defined in the 'black_list' or in the 'white_list'.
+
+            This feature is limited to users with Enterprise account.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :return: request response
+        """
+        url = "{}/repos/{}/{}/geo_restrictions".format(Bintray.BINTRAY_URL, subject, repo)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def update_geo_restrictions(self, subject, repo, white_list=[], black_list=[]):
+        """ Update the 'black_list' or 'white_list' with the related countries code.
+
+            This feature is limited to users with Enterprise account.
+
+            The update can be done on one list only.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param white_list: Countries in white list e.g. ["US", "CA"]
+        :param black_list: Countries in black list e.g. ["RU", "BR"]
+        :return: request response
+        """
+        url = "{}/repos/{}/{}/geo_restrictions".format(Bintray.BINTRAY_URL, subject, repo)
+        json_data = {}
+        if white_list and black_list:
+            raise ValueError("The update can be done on one list only.")
+        if white_list:
+            json_data["white_list"] = white_list
+        if black_list:
+            json_data["black_list"] = black_list
+        if not json_data:
+            raise ValueError("At lease one parameter must be filled.")
+        response = self._requester.put(url, json=json_data)
+        self._logger.put("Update successfully")
+        return response
+
+    def delete_geo_restrictions(self, subject, repo):
+        """ Remove all the countries from the 'white_list' and 'black_list'.
+
+            This feature is limited to users with Enterprise account.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :return: request response
+        """
+        url = "{}/repos/{}/{}/geo_restrictions".format(Bintray.BINTRAY_URL, subject, repo)
+        response = self._requester.delete(url)
+        self._logger.put("Delete successfully")
+        return response
+
+    def get_ip_restrictions(self, subject, repo):
+        """ Gets whitelisted and blacklisted CIDRs.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :return: request response
+        """
+        url = "{}/repos/{}/{}/ip_restrictions".format(Bintray.BINTRAY_URL, subject, repo)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def set_ip_restrictions(self, subject, repo, white_cidrs=None, black_cidrs=None):
+        """ Update ip restrictions with the given white list and black list of CIDRs.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param white_cidrs: white list for CIDRs
+        :param black_cidrs: black list for CIDRs
+        :return: request response
+        """
+        url = "{}/repos/{}/{}/ip_restrictions".format(Bintray.BINTRAY_URL, subject, repo)
+        json_data = {}
+        if isinstance(white_cidrs, list):
+            json_data["white_cidrs"] = white_cidrs
+        if isinstance(black_cidrs, list):
+            json_data["black_cidrs"] = black_cidrs
+        if not json_data:
+            raise ValueError("At lease one parameter must be filled.")
+
+        response = self._requester.put(url, json=json_data)
+        self._logger.info("Set successfully")
+        return response
+
+    def update_ip_restrictions(self, subject, repo, add_white_cidrs=None, rm_white_cidrs=None,
+                               add_black_cidrs=None, rm_black_cidrs=None):
+        """ Add or remove CIDRs from black/white list restrictions.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param add_white_cidrs: CIDRs to be added in the white list
+        :param rm_white_cidrs: CIDRs to be removed from the white list
+        :param add_black_cidrs: CIDRs to be added in the black list
+        :param rm_black_cidrs: CIDRs to be removed from the black list
+        :return: request response
+        """
+        url = "{}/repos/{}/{}/ip_restrictions".format(Bintray.BINTRAY_URL, subject, repo)
+        json_data = {}
+        if isinstance(add_white_cidrs, list):
+            json_data["add"] = {"white_cidrs": add_white_cidrs}
+        if isinstance(add_black_cidrs, list):
+            json_data["add"] = {"black_cidrs": add_black_cidrs}
+
+        if isinstance(rm_white_cidrs, list):
+            json_data["remove"] = {"white_cidrs": rm_white_cidrs}
+        if isinstance(rm_black_cidrs, list):
+            json_data["remove"] = {"black_cidrs": rm_black_cidrs}
+
+        if not json_data:
+            raise ValueError("At lease one parameter must be filled.")
+
+        response = self._requester.patch(url, json=json_data)
+        self._logger.info("Update successfully")
+        return response
+
+    def delete_ip_restrictions(self, subject, repo):
+        """ Removes all restrictions, black and white.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :return: request response
+        """
+        url = "{}/repos/{}/{}/ip_restrictions".format(Bintray.BINTRAY_URL, subject, repo)
+
+        response = self._requester.delete(url)
+        self._logger.info("Update successfully")
+        return response
