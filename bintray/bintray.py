@@ -967,3 +967,56 @@ class Bintray(object):
         response = self._requester.get(url)
         self._logger.info("Get successfully")
         return response
+
+    def set_ip_restrictions(self, subject, repo, white_cidrs=None, black_cidrs=None):
+        """ Update ip restrictions with the given white list and black list of CIDRs.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param white_cidrs: white list for CIDRs
+        :param black_cidrs: black list for CIDRs
+        :return: request response
+        """
+        url = "{}/repos/{}/{}/ip_restrictions".format(Bintray.BINTRAY_URL, subject, repo)
+        json_data = {}
+        if isinstance(white_cidrs, list):
+            json_data["white_cidrs"] = white_cidrs
+        if isinstance(black_cidrs, list):
+            json_data["black_cidrs"] = black_cidrs
+        if not json_data:
+            raise ValueError("At lease one parameter must be filled.")
+
+        response = self._requester.put(url, json=json_data)
+        self._logger.info("Set successfully")
+        return response
+
+    def update_ip_restrictions(self, subject, repo, add_white_cidrs=None, rm_white_cidrs=None,
+                               add_black_cidrs=None, rm_black_cidrs=None):
+        """ Add or remove CIDRs from black/white list restrictions.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param add_white_cidrs: CIDRs to be added in the white list
+        :param rm_white_cidrs: CIDRs to be removed from the white list
+        :param add_black_cidrs: CIDRs to be added in the black list
+        :param rm_black_cidrs: CIDRs to be removed from the black list
+        :return: request response
+        """
+        url = "{}/repos/{}/{}/ip_restrictions".format(Bintray.BINTRAY_URL, subject, repo)
+        json_data = {}
+        if isinstance(add_white_cidrs, list):
+            json_data["add"] = {"white_cidrs": add_white_cidrs}
+        if isinstance(add_black_cidrs, list):
+            json_data["add"] = {"black_cidrs": add_black_cidrs}
+
+        if isinstance(rm_white_cidrs, list):
+            json_data["remove"] = {"white_cidrs": rm_white_cidrs}
+        if isinstance(rm_black_cidrs, list):
+            json_data["remove"] = {"black_cidrs": rm_black_cidrs}
+
+        if not json_data:
+            raise ValueError("At lease one parameter must be filled.")
+
+        response = self._requester.patch(url, json=json_data)
+        self._logger.info("Update successfully")
+        return response

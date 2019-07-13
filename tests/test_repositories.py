@@ -176,3 +176,41 @@ def test_get_ip_restrictions():
             'hasWritePermission': None,
             'statusCode': 200,
             'white_cidrs': []} == response
+
+
+def test_set_ip_restrictions():
+    bintray = Bintray()
+    error_message = ""
+    try:
+        bintray.set_ip_restrictions("uilianries", "generic", white_cidrs=["10.0.0.1/32"],
+                                    black_cidrs=["192.168.0.1/32"])
+    except Exception as error:
+        error_message = str(error)
+    assert "Could not PUT (403): 403 Client Error: Forbidden for url: " \
+           "https://api.bintray.com/repos/uilianries/generic/ip_restrictions" == error_message
+
+    try:
+        bintray.set_ip_restrictions("uilianries", "generic")
+    except Exception as error:
+        error_message = str(error)
+    assert "At lease one parameter must be filled." == error_message
+
+
+def test_update_ip_restrictions():
+    bintray = Bintray()
+    error_message = ""
+    try:
+        bintray.update_ip_restrictions("uilianries", "generic", add_white_cidrs=["10.0.0.1/32"],
+                                       rm_white_cidrs=["10.0.0.2/32"],
+                                       add_black_cidrs=["192.168.0.1/32"],
+                                       rm_black_cidrs=["192.168.0.2/32"])
+    except Exception as error:
+        error_message = str(error)
+    assert "Could not PATCH (403): 403 Client Error: Forbidden for url: " \
+           "https://api.bintray.com/repos/uilianries/generic/ip_restrictions" == error_message
+
+    try:
+        bintray.update_ip_restrictions("uilianries", "generic")
+    except Exception as error:
+        error_message = str(error)
+    assert "At lease one parameter must be filled." == error_message
