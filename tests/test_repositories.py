@@ -61,3 +61,20 @@ def test_delete_repo(create_repo):
     bintray = Bintray()
     response = bintray.delete_repository("uilianries", TEMPORARY_REPO)
     assert {'error': False, 'statusCode': 200, 'message': 'success'} == response
+
+
+def test_search_repository():
+    bintray = Bintray()
+    response = bintray.search_repository("conan-center")
+    assert response[0].get("name") == "conan-center"
+    assert response[0].get("owner") == "conan"
+
+
+def test_search_repository_empty():
+    bintray = Bintray()
+    error_message = ""
+    try:
+        bintray.search_repository()
+    except ValueError as error:
+        error_message = str(error)
+    assert "At lease one parameter must be filled." == error_message

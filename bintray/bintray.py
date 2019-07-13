@@ -798,3 +798,33 @@ class Bintray(object):
         response = self._requester.delete(url)
         self._logger.info("Repository {} deleted successfully".format(repo))
         return response
+
+    def search_repository(self, name=None, description=None):
+        """ Search for a repository.
+
+            At least one of the name and desc search fields need to be specified.
+
+            Returns an array of results, where elements are similar to the result of getting a
+            single repository.
+
+            Search results will not contain private repositories.
+
+            Security: Authenticated user is required
+
+        :param name: repository name
+        :param description: repository name
+        :return: request response
+        """
+        url = "{}/search/repos".format(Bintray.BINTRAY_URL)
+        params = {}
+        if name:
+            params["name"] = name
+        if description:
+            params["desc"] = description
+
+        if not params:
+            raise ValueError("At lease one parameter must be filled.")
+
+        response = self._requester.get(url, params=params)
+        self._logger.info("Repository {} searched successfully".format(params))
+        return response
