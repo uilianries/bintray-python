@@ -828,3 +828,26 @@ class Bintray(object):
         response = self._requester.get(url, params=params)
         self._logger.info("Repository {} searched successfully".format(params))
         return response
+
+    def link_package(self, subject, repo, source_subject, source_repo, source_package,
+                     path_prefix=None):
+        """ Link the package source_package into the repo repository.
+
+            Caller must be an admin of the organization owning the repository.
+
+        :param subject: target subject name
+        :param repo: target subject repository
+        :param source_subject: source subject
+        :param source_repo: source repository
+        :param source_package: source package name
+        :param path_prefix: path to include the files from
+        :return: request response
+        """
+        url = "{}/repository/{}/{}/links/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo,
+                                                          source_subject, source_repo,
+                                                          source_package)
+        json_data = {"path_prefix": path_prefix} if path_prefix else None
+
+        response = self._requester.put(url, json=json_data)
+        self._logger.info("Link package successfully")
+        return response

@@ -78,3 +78,15 @@ def test_search_repository_empty():
     except ValueError as error:
         error_message = str(error)
     assert "At lease one parameter must be filled." == error_message
+
+
+def test_link_package():
+    bintray = Bintray()
+    error_message = ""
+    try:
+        bintray.link_package("uilianries", "statistics", "uilianries", "generic", "statistics")
+    except Exception as error:
+        error_message = str(error)
+    assert "Could not PUT (403): 403 Client Error: Forbidden for url: " \
+            "https://api.bintray.com/repository/uilianries/statistics/links/" \
+            "uilianries/generic/statistics" == error_message
