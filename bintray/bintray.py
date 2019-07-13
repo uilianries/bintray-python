@@ -851,3 +851,22 @@ class Bintray(object):
         response = self._requester.put(url, json=json_data)
         self._logger.info("Link package successfully")
         return response
+
+    def unlink_package(self, subject, repo, source_subject, source_repo, source_package):
+        """ Unlink the package source_package from the repo repository.
+
+            Caller must be an admin of the organization owning the repository.
+
+        :param subject: target subject name
+        :param repo: target subject repository
+        :param source_subject: source subject
+        :param source_repo: source repository
+        :param source_package: source package name
+        :return: request response
+        """
+        url = "{}/repository/{}/{}/links/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo,
+                                                          source_subject, source_repo,
+                                                          source_package)
+        response = self._requester.delete(url)
+        self._logger.info("Unlink package successfully")
+        return response

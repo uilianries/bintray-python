@@ -90,3 +90,15 @@ def test_link_package():
     assert "Could not PUT (403): 403 Client Error: Forbidden for url: " \
             "https://api.bintray.com/repository/uilianries/statistics/links/" \
             "uilianries/generic/statistics" == error_message
+
+
+def test_unlink_package():
+    bintray = Bintray()
+    error_message = ""
+    try:
+        bintray.unlink_package("uilianries", "statistics", "uilianries", "generic", "statistics")
+    except Exception as error:
+        error_message = str(error)
+    assert "Could not DELETE (404): 404 Client Error: Not Found for url: " \
+            "https://api.bintray.com/repository/uilianries/statistics/links/" \
+            "uilianries/generic/statistics" == error_message
