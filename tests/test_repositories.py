@@ -166,3 +166,13 @@ def test_delete_geo_restrictions():
         error_message = str(error)
     assert "Could not DELETE (403): 403 Client Error: Forbidden for url: " \
            "https://api.bintray.com/repos/uilianries/generic/geo_restrictions" == error_message
+
+
+def test_get_ip_restrictions():
+    bintray = Bintray()
+    response = bintray.get_ip_restrictions("uilianries", "generic")
+    assert {'black_cidrs': [],
+            'error': False,
+            'hasWritePermission': None,
+            'statusCode': 200,
+            'white_cidrs': []} == response

@@ -955,3 +955,15 @@ class Bintray(object):
         response = self._requester.delete(url)
         self._logger.put("Delete successfully")
         return response
+
+    def get_ip_restrictions(self, subject, repo):
+        """ Gets whitelisted and blacklisted CIDRs.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :return: request response
+        """
+        url = "{}/repos/{}/{}/ip_restrictions".format(Bintray.BINTRAY_URL, subject, repo)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
