@@ -1086,9 +1086,42 @@ class Bintray(object):
         self._logger.info("Get successfully")
         return response
 
+    def create_version(self, subject, repo, package, name, description=None,
+                       released=None, github_release_notes_file=None,
+                       github_use_tag_release_notes=None, vcs_tag=None):
+        """ Creates a new version in the specified package (user has to be owner of the package)
 
-    def create_version(self):
-        pass
+            Security: Authenticated user with 'publish' permission, or package read/write
+                      entitlement.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param name: version name
+        :param description: version description
+        :param released: release date ISO8601
+        :param github_release_notes_file: file path for release notes e.g. RELEASE.txt
+        :param github_use_tag_release_notes: True when contain release notes file
+        :param vcs_tag: tag name in VCS
+        :return: request response
+        """
+        url = "{}/packages/{}/{}/{}/versions".format(Bintray.BINTRAY_URL, subject, repo, package)
+        json_data = {'name': name}
+        if isinstance(description, str):
+            json_data["desc"] = description
+        if isinstance(released, str):
+            json_data["released"] = released
+        if isinstance(github_release_notes_file, str):
+            json_data["github_release_notes_file"] = github_release_notes_file
+        if isinstance(github_use_tag_release_notes, bool):
+            json_data["github_use_tag_release_notes"] = github_use_tag_release_notes
+        if isinstance(vcs_tag, str):
+            json_data["vcs_tag"] = vcs_tag
+
+        response = self._requester.post(url, json=json_data)
+        self._logger.info("Create successfully")
+        return response
+
 
     def delete_version(self):
         pass
