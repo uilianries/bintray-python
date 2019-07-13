@@ -661,3 +661,15 @@ class Bintray(object):
         url = "{}/repos/{}".format(Bintray.BINTRAY_URL, subject)
         return self._requester.get(url)
 
+    def get_repository(self, subject, repo):
+        """ Get general information about a repository of the specified user
+
+            Security: Authenticated user with 'read' permission for private repositories,
+                      or repository read entitlement.
+
+        :param subject: Subject name
+        :param repo: Repository name
+        :return: Repository information
+        """
+        url = "{}/repos/{}/{}".format(Bintray.BINTRAY_URL, subject, repo)
+        return self._requester.get(url)
