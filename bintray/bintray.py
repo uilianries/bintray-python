@@ -3,6 +3,7 @@
 
     https://bintray.com/docs/api
 """
+import json
 import os
 
 from bintray.requester import Requester
@@ -442,49 +443,81 @@ class Bintray(object):
         url = "{}/users/{}/licenses".format(Bintray.BINTRAY_URL, user)
         return self._requester.get(url)
 
-    def create_org_proprietary_license(self, org, license):
+    def create_org_proprietary_license(self, org, name, description, url):
         """ Create a license associated with an organization.
             Caller must be an admin of the organization.
 
         :param org: Organization name
-        :param license: JSON data with license information
+        :param name: license name
+        :param description: license description
+        :param url: license url
         :return: request answer
         """
-        url = "{}/orgs/{}/licenses".format(Bintray.BINTRAY_URL, org)
-        return self._requester.post(url, json=license)
+        url_request = "{}/orgs/{}/licenses".format(Bintray.BINTRAY_URL, org)
+        json_data = {
+            'name': name,
+            'description': description,
+            'url': url
+        }
+        return self._requester.post(url_request, json=json_data)
 
-    def create_user_proprietary_license(self, user, license):
+    def create_user_proprietary_license(self, user, name, description, url):
         """ Create a license associated with an user.
 
         :param user: User name
-        :param license: JSON data with license information
-        :return: request answer
+        :param name: license name
+        :param description: license description
+        :param url: license url
+        :return: request response
         """
-        url = "{}/users/{}/licenses".format(Bintray.BINTRAY_URL, user)
-        return self._requester.post(url, json=license)
+        url_request = "{}/users/{}/licenses".format(Bintray.BINTRAY_URL, user)
+        json_data = {
+            'name': name,
+            'description': description,
+            'url': url
+        }
+        return self._requester.post(url_request, json=json_data)
 
-    def update_org_proprietary_license(self, org, custom_license_name, license):
+    def update_org_proprietary_license(self, org, custom_license_name, description=None, url=None):
         """ Update a license associated with an organization.
             Caller must be an admin of the organization.
 
         :param org: Organization name
         :param custom_license_name: License to be updated
-        :param license: JSON data with license information
+        :param description: license description
+        :param url: license url
         :return: request answer
         """
-        url = "{}/orgs/{}/licenses/{}".format(Bintray.BINTRAY_URL, org, custom_license_name)
-        return self._requester.patch(url, json=license)
+        request_url = "{}/orgs/{}/licenses/{}".format(Bintray.BINTRAY_URL, org, custom_license_name)
+        json_data = {}
+        if isinstance(description, str):
+            json_data["description"] = description
+        if isinstance(url, str):
+            json_data["url"] = url
+        return self._requester.patch(request_url, json=json_data)
 
-    def update_user_proprietary_license(self, user, custom_license_name, license):
+    def update_user_proprietary_license(self, user, custom_license_name, description=None,
+                                        url=None):
         """ Update a license associated with an user.
 
         :param user: User name
         :param custom_license_name: License to be updated
-        :param license: JSON data with license information
+        :param description: license description
+        :param url: license url
         :return: request answer
         """
-        url = "{}/users/{}/licenses/{}".format(Bintray.BINTRAY_URL, user, custom_license_name)
-        return self._requester.patch(url, json=license)
+        request_url = "{}/users/{}/licenses/{}".format(Bintray.BINTRAY_URL, user,
+                                                       custom_license_name)
+        json_data = {}
+        if isinstance(description, str):
+            json_data["description"] = description
+        if isinstance(url, str):
+            json_data["url"] = url
+
+        if not json_data:
+            raise ValueError("At lease one parameter must be filled.")
+
+        return self._requester.patch(request_url, json=json_data)
 
     def delete_org_proprietary_license(self, org, custom_license_name):
         """ Delete a license associated with an organization.
