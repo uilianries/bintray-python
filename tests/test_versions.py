@@ -46,3 +46,10 @@ def test_update_version(create_version):
                                       version=PACKAGE_VERSION, description="foobar",
                                       vcs_tag="0.1.1")
     assert {'error': False, 'message': 'success', 'statusCode': 200} == response
+
+
+def test_version_for_file():
+    bintray = Bintray()
+    response = bintray.version_for_file("uilianries", "generic", "packages.json")
+    assert response.get("error") == False
+    assert response.get("statusCode") == 200

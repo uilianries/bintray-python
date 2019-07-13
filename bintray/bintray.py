@@ -1178,9 +1178,17 @@ class Bintray(object):
         self._logger.info("Create successfully")
         return response
 
-        # PATCH /packages/:subject/:repo/:package/versions/:version
+    def version_for_file(self, subject, repo, file_path):
+        """ Get general information about the version a repository file is associated with.
 
+            Security: Non-authenticated user.
 
-
-    def version_for_file(self):
-        pass
+        :param subject: repository owner
+        :param repo: repository name
+        :param file_path: associated file path
+        :return: request response
+        """
+        url = "{}/file_version/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, file_path)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
