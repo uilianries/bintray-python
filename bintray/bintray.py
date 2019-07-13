@@ -910,3 +910,32 @@ class Bintray(object):
         response = self._requester.get(url)
         self._logger.info("Get successfully")
         return response
+
+    def update_geo_restrictions(self, subject, repo, white_list=[], black_list=[]):
+        """ Update the 'black_list' or 'white_list' with the related countries code.
+
+            This feature is limited to users with Enterprise account.
+
+            The update can be done on one list only.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param white_list: Countries in white list e.g. ["US", "CA"]
+        :param black_list: Countries in black list e.g. ["RU", "BR"]
+        :return: request response
+        """
+        url = "{}/repos/{}/{}/geo_restrictions".format(Bintray.BINTRAY_URL, subject, repo)
+        json_data = {}
+        if white_list and black_list:
+            raise ValueError("The update can be done on one list only.")
+        if white_list:
+            json_data["white_list"] = white_list
+        if black_list:
+            json_data["black_list"] = black_list
+        if not json_data:
+            raise ValueError("At lease one parameter must be filled.")
+        response = self._requester.put(url, json=json_data)
+        self._logger.put("Update successfully")
+        return response

@@ -124,3 +124,34 @@ def test_get_geo_restrictions():
         error_message = str(error)
     assert "Could not GET (403): 403 Client Error: Forbidden for url: " \
            "https://api.bintray.com/repos/uilianries/generic/geo_restrictions" == error_message
+
+
+def test_update_geo_restrictions():
+    bintray = Bintray()
+    error_message = ""
+    try:
+        bintray.update_geo_restrictions("uilianries", "generic", white_list=["US", "CA"])
+    except Exception as error:
+        error_message = str(error)
+    assert "Could not PUT (403): 403 Client Error: Forbidden for url: " \
+           "https://api.bintray.com/repos/uilianries/generic/geo_restrictions" == error_message
+
+    try:
+        bintray.update_geo_restrictions("uilianries", "generic", black_list=["US", "CA"])
+    except Exception as error:
+        error_message = str(error)
+    assert "Could not PUT (403): 403 Client Error: Forbidden for url: " \
+           "https://api.bintray.com/repos/uilianries/generic/geo_restrictions" == error_message
+
+    try:
+        bintray.update_geo_restrictions("uilianries", "generic")
+    except Exception as error:
+        error_message = str(error)
+    assert "At lease one parameter must be filled." == error_message
+
+    try:
+        bintray.update_geo_restrictions("uilianries", "generic", black_list=["US", "CA"],
+                                        white_list=["CH", "RU"])
+    except Exception as error:
+        error_message = str(error)
+    assert "The update can be done on one list only." == error_message
