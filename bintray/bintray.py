@@ -1020,3 +1020,16 @@ class Bintray(object):
         response = self._requester.patch(url, json=json_data)
         self._logger.info("Update successfully")
         return response
+
+    def delete_ip_restrictions(self, subject, repo):
+        """ Removes all restrictions, black and white.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :return: request response
+        """
+        url = "{}/repos/{}/{}/ip_restrictions".format(Bintray.BINTRAY_URL, subject, repo)
+
+        response = self._requester.delete(url)
+        self._logger.info("Update successfully")
+        return response

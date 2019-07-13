@@ -214,3 +214,14 @@ def test_update_ip_restrictions():
     except Exception as error:
         error_message = str(error)
     assert "At lease one parameter must be filled." == error_message
+
+
+def test_delete_ip_restrictions():
+    bintray = Bintray()
+    error_message = ""
+    try:
+        bintray.delete_ip_restrictions("uilianries", "generic")
+    except Exception as error:
+        error_message = str(error)
+    assert "Could not DELETE (403): 403 Client Error: Forbidden for url: " \
+           "https://api.bintray.com/repos/uilianries/generic/ip_restrictions" == error_message
