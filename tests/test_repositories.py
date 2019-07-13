@@ -102,3 +102,14 @@ def test_unlink_package():
     assert "Could not DELETE (404): 404 Client Error: Not Found for url: " \
             "https://api.bintray.com/repository/uilianries/statistics/links/" \
             "uilianries/generic/statistics" == error_message
+
+
+def test_schedule_metadata_calculation():
+    bintray = Bintray()
+    error_message = ""
+    try:
+        bintray.schedule_metadata_calculation("uilianries", "generic")
+    except Exception as error:
+        error_message = str(error)
+    assert "Could not POST (400): 400 Client Error: Bad Request for url: " \
+           "https://api.bintray.com/calc_metadata/uilianries/generic" == error_message

@@ -870,3 +870,27 @@ class Bintray(object):
         response = self._requester.delete(url)
         self._logger.info("Unlink package successfully")
         return response
+
+    def schedule_metadata_calculation(self, subject, repo, path=None):
+        """ Schedule metadata (index) calculation for the specified repository.
+
+            For a Maven repository you need to specify the path in the repository for which the
+            metadata should be calculated. For an RPM repository, you need to specify the path
+            according to the repository 'YUM Metadata Folder Depth' field, if different from zero.
+            For other repository types the path is ignored.
+
+            Security: Authenticated user with 'publish' permission, or repository read/write
+            entitlement.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param path: path in the repository
+        :return: request response
+        """
+        url = "{}/calc_metadata/{}/{}".format(Bintray.BINTRAY_URL, subject, repo)
+        if path:
+            url += '/' + path
+
+        response = self._requester.post(url)
+        self._logger.info("Schedule metadata successfully")
+        return response
