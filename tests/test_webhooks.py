@@ -21,3 +21,9 @@ def test_test_webhook():
     response = bintray.test_webhook("uilianries", "generic", "statistics", "tests",
                                     "https://example.com/", "get")
     assert {'error': False, 'message': 'success', 'statusCode': 201} == response
+
+
+def test_delete_webhook():
+    bintray = Bintray()
+    response = bintray.delete_webhook("uilianries", "generic", "statistics")
+    assert {'error': False, 'message': 'success', 'statusCode': 200} == response

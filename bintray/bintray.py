@@ -1451,3 +1451,20 @@ class Bintray(object):
         response = self._requester.post(url_requrest, json=json_data)
         self._logger.info("Get successfully")
         return response
+
+    def delete_webhook(self, subject, repo, package):
+        """ Delete a user’s webhook associated with the specified package.
+
+            Security: Authenticated user with 'publish' permission, or package read/write
+                      entitlement.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :return: request response
+        """
+        url = "{}/webhooks/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, package)
+
+        response = self._requester.delete(url)
+        self._logger.info("Get successfully")
+        return response
