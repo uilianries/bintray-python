@@ -1358,5 +1358,18 @@ class Bintray(object):
         self._logger.info("Get successfully")
         return response
 
-    def user_search(self):
-        pass
+    def search_user(self, name):
+        """ Search for a user.
+
+            Security: Authenticated user is required
+
+        :param name: name to be searched
+        :return: Returns an array of results, where elements are similar to the result of getting a
+                 single user.
+        """
+        url = "{}/search/users".format(Bintray.BINTRAY_URL)
+        params = {"name": name}
+
+        response = self._requester.get(url, params=params)
+        self._logger.info("Get successfully")
+        return response
