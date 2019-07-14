@@ -1192,3 +1192,31 @@ class Bintray(object):
         response = self._requester.get(url)
         self._logger.info("Get successfully")
         return response
+
+    # Readme
+
+    def get_readme(self, subject, repo, package):
+        """ Returns the readme for the specified package by subject.
+            Either Bintray readme or GitHub readme.
+
+            Security: Authenticated user with 'read' permission for private repositories,
+                      or package read entitlement.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :return: request response
+        """
+        url = "{}/packages/{}/{}/{}/readme".format(Bintray.BINTRAY_URL, subject, repo, package)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def create_readme(self):
+        pass
+
+    def create_product_readme(self):
+        pass
+
+    def delete_product_readme(self):
+        pass
