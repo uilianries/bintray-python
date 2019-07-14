@@ -1323,8 +1323,21 @@ class Bintray(object):
         self._logger.info("Get successfully")
         return response
 
-    def get_organization(self):
-        pass
+    def get_organization(self, organization):
+        """ Get information about a specified organization.
+
+            "type" inside the "members" list is available only to organization admins
+            "teams" list is available only to Premium organization admins
+
+            Security: Authenticated user is required
+
+        :param organization: organization name to be searched
+        :return: organization information
+        """
+        url = "{}/orgs/{}".format(Bintray.BINTRAY_URL, organization)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
 
     def get_followers(self):
         pass
