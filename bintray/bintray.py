@@ -1307,3 +1307,27 @@ class Bintray(object):
         response = self._requester.delete(url)
         self._logger.info("Delete successfully")
         return response
+
+    # Users & Organizations
+
+    def get_user(self, user):
+        """ Get information about a specified user
+
+            Security: Get information about a specified user
+
+        :param user: user name
+        :return: user information
+        """
+        url = "{}/users/{}".format(Bintray.BINTRAY_URL, user)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def get_organization(self):
+        pass
+
+    def get_followers(self):
+        pass
+
+    def user_search(self):
+        pass
