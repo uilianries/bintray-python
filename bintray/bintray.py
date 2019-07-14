@@ -1307,3 +1307,69 @@ class Bintray(object):
         response = self._requester.delete(url)
         self._logger.info("Delete successfully")
         return response
+
+    # Users & Organizations
+
+    def get_user(self, user):
+        """ Get information about a specified user
+
+            Security: Get information about a specified user
+
+        :param user: user name
+        :return: user information
+        """
+        url = "{}/users/{}".format(Bintray.BINTRAY_URL, user)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def get_organization(self, organization):
+        """ Get information about a specified organization.
+
+            "type" inside the "members" list is available only to organization admins
+            "teams" list is available only to Premium organization admins
+
+            Security: Authenticated user is required
+
+        :param organization: organization name to be searched
+        :return: organization information
+        """
+        url = "{}/orgs/{}".format(Bintray.BINTRAY_URL, organization)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def get_followers(self, user, start_pos=None):
+        """ Get followers of the specified repository owner
+
+            Security: Authenticated user is required
+
+        :param user: user name to be searched
+        :param start_pos: initial index position
+        :return: follower list
+        """
+        url = "{}/users/{}/followers".format(Bintray.BINTRAY_URL, user)
+        params = None
+
+        if isinstance(start_pos, int):
+            params = {"start_pos": start_pos}
+
+        response = self._requester.get(url, params=params)
+        self._logger.info("Get successfully")
+        return response
+
+    def search_user(self, name):
+        """ Search for a user.
+
+            Security: Authenticated user is required
+
+        :param name: name to be searched
+        :return: Returns an array of results, where elements are similar to the result of getting a
+                 single user.
+        """
+        url = "{}/search/users".format(Bintray.BINTRAY_URL)
+        params = {"name": name}
+
+        response = self._requester.get(url, params=params)
+        self._logger.info("Get successfully")
+        return response
