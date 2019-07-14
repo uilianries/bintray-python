@@ -1395,3 +1395,31 @@ class Bintray(object):
         response = self._requester.get(url)
         self._logger.info("Get successfully")
         return response
+
+    def register_webhook(self, subject, repository, package, url, method):
+        """ Register a webhook for receiving notifications on a new package release.
+
+            By default a user can register up to 10 webhook callbacks.
+            The callback URL may contain the %r and %p tokens for repo and package name,
+            respectively. method is the callback request method: can be in post, put or get.
+            If not specified, post is used.
+
+            Security: Authenticated user with 'publish' permission, or package read/write
+                      entitlement.
+
+        :param subject: repository owner
+        :param repository: repository name
+        :param package: package name
+        :param url: URL for callback
+        :param method: HTTP method for callback e.g. "post"
+        :return: request response
+        """
+        request_url = "{}/webhooks/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repository, package)
+        json_data = {
+            "url": url,
+            "method": method
+        }
+
+        response = self._requester.post(request_url, json=json_data)
+        self._logger.info("Register successfully")
+        return response
