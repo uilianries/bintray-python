@@ -1373,3 +1373,25 @@ class Bintray(object):
         response = self._requester.get(url, params=params)
         self._logger.info("Get successfully")
         return response
+
+    # Webhooks
+
+    def get_webhooks(self, subject, repo=None):
+        """ Get all the webhooks registered for the specified subject, optionally for a specific
+            repository.
+
+            failure_count is the number of times a callback has failed.
+            A callback will be auto-deactivated after 7 subsequent failures.
+            A successful callback resets the count.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :return: list with web hooks
+        """
+        url = "{}/webhooks/{}".format(Bintray.BINTRAY_URL, subject)
+        if isinstance(repo, str):
+            url += '/' + repo
+
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
