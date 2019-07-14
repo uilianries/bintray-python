@@ -1396,7 +1396,7 @@ class Bintray(object):
         self._logger.info("Get successfully")
         return response
 
-    def register_webhook(self, subject, repository, package, url, method):
+    def register_webhook(self, subject, repo, package, url, method):
         """ Register a webhook for receiving notifications on a new package release.
 
             By default a user can register up to 10 webhook callbacks.
@@ -1408,13 +1408,13 @@ class Bintray(object):
                       entitlement.
 
         :param subject: repository owner
-        :param repository: repository name
+        :param repo: repository name
         :param package: package name
         :param url: URL for callback
         :param method: HTTP method for callback e.g. "post"
         :return: request response
         """
-        request_url = "{}/webhooks/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repository, package)
+        request_url = "{}/webhooks/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, package)
         json_data = {
             "url": url,
             "method": method
@@ -1422,4 +1422,32 @@ class Bintray(object):
 
         response = self._requester.post(request_url, json=json_data)
         self._logger.info("Register successfully")
+        return response
+
+    def test_webhook(self, subject, repo, package, version, url, method):
+        """ Test a webhook callback for the specified package release.
+
+            A webhook post request is authenticated with an HMAC-SHA256 authentication header of the
+            package name keyed by the registering subject’s API key, and base64-encoded.
+
+            Security: Authenticated user with 'publish' permission, or package read/write
+                      entitlement.
+
+        :param subject: repositoy owner
+        :param repo: repository name
+        :param package: package name
+        :param version: package version
+        :param url: URL for callback
+        :param method: HTTP method for callback
+        :return: request response
+        """
+        url_requrest = "{}/webhooks/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, package,
+                                                     version)
+        json_data = {
+            "url": url,
+            "method": method
+        }
+
+        response = self._requester.post(url_requrest, json=json_data)
+        self._logger.info("Get successfully")
         return response

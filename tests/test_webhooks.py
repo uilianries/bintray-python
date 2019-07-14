@@ -15,3 +15,9 @@ def test_register_webhook():
                                         "https://example.com/", "get")
     assert {'error': False, 'message': 'success', 'statusCode': 201} == response
 
+
+def test_test_webhook():
+    bintray = Bintray()
+    response = bintray.test_webhook("uilianries", "generic", "statistics", "tests",
+                                    "https://example.com/", "get")
+    assert {'error': False, 'message': 'success', 'statusCode': 201} == response
