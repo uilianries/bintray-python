@@ -1339,8 +1339,24 @@ class Bintray(object):
         self._logger.info("Get successfully")
         return response
 
-    def get_followers(self):
-        pass
+    def get_followers(self, user, start_pos=None):
+        """ Get followers of the specified repository owner
+
+            Security: Authenticated user is required
+
+        :param user: user name to be searched
+        :param start_pos: initial index position
+        :return: follower list
+        """
+        url = "{}/users/{}/followers".format(Bintray.BINTRAY_URL, user)
+        params = None
+
+        if isinstance(start_pos, int):
+            params = {"start_pos": start_pos}
+
+        response = self._requester.get(url, params=params)
+        self._logger.info("Get successfully")
+        return response
 
     def user_search(self):
         pass
