@@ -1293,6 +1293,17 @@ class Bintray(object):
         self._logger.info("Create successfully")
         return response
 
+    def delete_product_readme(self, subject, product):
+        """ Deletes the readme for all of a product’s underlying packages.
 
-    def delete_product_readme(self):
-        pass
+            Security: Authenticated user with 'publish' permission.
+
+        :param subject: repository owner
+        :param product: product name
+        :return: request response
+        """
+        url = "{}/products/{}/{}/readme".format(Bintray.BINTRAY_URL, subject, product)
+
+        response = self._requester.delete(url)
+        self._logger.info("Delete successfully")
+        return response
