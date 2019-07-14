@@ -1373,3 +1373,98 @@ class Bintray(object):
         response = self._requester.get(url, params=params)
         self._logger.info("Get successfully")
         return response
+
+    # Webhooks
+
+    def get_webhooks(self, subject, repo=None):
+        """ Get all the webhooks registered for the specified subject, optionally for a specific
+            repository.
+
+            failure_count is the number of times a callback has failed.
+            A callback will be auto-deactivated after 7 subsequent failures.
+            A successful callback resets the count.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :return: list with web hooks
+        """
+        url = "{}/webhooks/{}".format(Bintray.BINTRAY_URL, subject)
+        if isinstance(repo, str):
+            url += '/' + repo
+
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def register_webhook(self, subject, repo, package, url, method):
+        """ Register a webhook for receiving notifications on a new package release.
+
+            By default a user can register up to 10 webhook callbacks.
+            The callback URL may contain the %r and %p tokens for repo and package name,
+            respectively. method is the callback request method: can be in post, put or get.
+            If not specified, post is used.
+
+            Security: Authenticated user with 'publish' permission, or package read/write
+                      entitlement.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param url: URL for callback
+        :param method: HTTP method for callback e.g. "post"
+        :return: request response
+        """
+        request_url = "{}/webhooks/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, package)
+        json_data = {
+            "url": url,
+            "method": method
+        }
+
+        response = self._requester.post(request_url, json=json_data)
+        self._logger.info("Register successfully")
+        return response
+
+    def test_webhook(self, subject, repo, package, version, url, method):
+        """ Test a webhook callback for the specified package release.
+
+            A webhook post request is authenticated with an HMAC-SHA256 authentication header of the
+            package name keyed by the registering subject’s API key, and base64-encoded.
+
+            Security: Authenticated user with 'publish' permission, or package read/write
+                      entitlement.
+
+        :param subject: repositoy owner
+        :param repo: repository name
+        :param package: package name
+        :param version: package version
+        :param url: URL for callback
+        :param method: HTTP method for callback
+        :return: request response
+        """
+        url_requrest = "{}/webhooks/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, package,
+                                                     version)
+        json_data = {
+            "url": url,
+            "method": method
+        }
+
+        response = self._requester.post(url_requrest, json=json_data)
+        self._logger.info("Get successfully")
+        return response
+
+    def delete_webhook(self, subject, repo, package):
+        """ Delete a user’s webhook associated with the specified package.
+
+            Security: Authenticated user with 'publish' permission, or package read/write
+                      entitlement.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :return: request response
+        """
+        url = "{}/webhooks/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, package)
+
+        response = self._requester.delete(url)
+        self._logger.info("Get successfully")
+        return response
