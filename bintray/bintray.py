@@ -1212,8 +1212,48 @@ class Bintray(object):
         self._logger.info("Get successfully")
         return response
 
-    def create_readme(self):
-        pass
+    def create_readme(self, subject, repo, package, github=None, bintray_syntax=None,
+                      bintray_content=None):
+        """ Creates a new readme for the specified package by subject.
+
+            "content" has to be passed to the command if using "bintray", or will be retrieved from
+            a GitHub repository, when using "github". GitHub repository name has to be provided.
+
+            Security: Authenticated user with 'publish' permission,
+                      or package read/write entitlement.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param github: Github URL with README
+        :param bintray_syntax: Readme syntax e.g. [markdown/asciidoc/plain_text default markdown]
+        :param bintray_content: Readme content
+        :return: request response
+        """
+        if github and (bintray_syntax or bintray_content):
+            raise ValueError("Only accept github or bintray")
+
+        url = "{}/packages/{}/{}/{}/readme".format(Bintray.BINTRAY_URL, subject, repo, package)
+        json_data = {}
+        if isinstance(github, str):
+            json_data["github"] = {
+                "github_repo": github
+            }
+        if isinstance(bintray_syntax, str) and isinstance(bintray_content, str):
+            json_data = {"bintray": {
+                    "syntax": bintray_syntax,
+                    "content": bintray_content
+                }
+            }
+
+        if not json_data:
+            raise ValueError("At lease one parameter must be filled.")
+
+        response = self._requester.post(url, json_data)
+        self._logger.info("Create successfully")
+        return response
+
+
 
     def create_product_readme(self):
         pass

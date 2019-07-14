@@ -1,0 +1,27 @@
+# -*- coding: utf-8 -*-
+
+from bintray.bintray import Bintray
+
+
+def test_get_readme():
+    bintray = Bintray()
+    response = bintray.get_readme("bincrafters", "public-conan", "Catch%3Abincrafters")
+    assert {'error': False,
+            'github': {'github_repo': 'bincrafters/conan-catch'},
+            'owner': 'bincrafters',
+            'package': 'Catch:bincrafters',
+            'repo': 'public-conan',
+            'statusCode': 200} == response
+
+
+def test_create_readme():
+    bintray = Bintray()
+    response = bintray.create_readme("uilianries", "generic", "statistics",
+                                  github="uilianries/bintray-python")
+    assert {'error': False,
+            'github': {'github_repo': 'uilianries/bintray-python'},
+            'owner': 'uilianries',
+            'package': 'statistics',
+            'repo': 'generic',
+            'statusCode': 200} == response
+
