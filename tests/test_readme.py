@@ -25,3 +25,16 @@ def test_create_readme():
             'repo': 'generic',
             'statusCode': 200} == response
 
+
+def test_create_product_readme():
+    bintray = Bintray()
+    error_message = ""
+    try:
+        bintray.create_product_readme("uilianries", "generic",
+                                      github="uilianries/bintray-python")
+    except Exception as error:
+        error_message = str(error)
+
+    assert "Could not POST (404): 404 Client Error: Not Found for url: " \
+           "https://api.bintray.com/products/uilianries/generic/readme" == error_message
+
