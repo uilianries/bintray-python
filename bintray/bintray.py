@@ -1764,3 +1764,21 @@ class Bintray(object):
         response = self._requester.put(url, json=json_data)
         self._logger.info("Set successfully")
         return response
+
+    def delete_team_permission(self, subject, repo, team):
+        """ Delete the permission defined for a team on the specified repository
+
+            This resource is only available to Bintray Premium users.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param team: team name
+        :return: request response
+        """
+        url = "{}/repos/{}/{}/permissions/{}".format(Bintray.BINTRAY_URL, subject, repo, team)
+
+        response = self._requester.delete(url)
+        self._logger.info("Delete successfully")
+        return response
