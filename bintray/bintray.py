@@ -1781,3 +1781,22 @@ class Bintray(object):
         response = self._requester.delete(url)
         self._logger.info("Delete successfully")
         return response
+
+    # Subjects
+
+    def regenerate_subject_url_signing_key(self, subject):
+        """ Re-generates Subject key for URL Signing.
+
+            This resource is only available to Bintray Premium users.
+            For organization, caller must be an admin of the organization.
+
+            Note: regenerating the URL signing key will revoke all active signed URLs.
+
+        :param subject: repository owner
+        :return: request response
+        """
+        url = "{}/subjects/{}/keypair".format(Bintray.BINTRAY_URL, subject)
+
+        response = self._requester.post(url)
+        self._logger.info("Generate successfully")
+        return response
