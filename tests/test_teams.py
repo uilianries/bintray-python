@@ -96,3 +96,15 @@ def test_delete_team():
         error_message = str(error)
     assert "Could not DELETE (404): 404 Client Error: Not Found for url: " \
            "https://api.bintray.com/orgs/jfrog/teams/bintray" == error_message
+
+
+def test_get_all_team_permissions():
+    bintray = Bintray()
+    error_message = ""
+
+    try:
+        bintray.get_all_team_permissions("uilianries", "generic")
+    except Exception as error:
+        error_message = str(error)
+    assert "Could not GET (400): 400 Client Error: Bad Request for url: " \
+           "https://api.bintray.com/repos/uilianries/generic/permissions" == error_message

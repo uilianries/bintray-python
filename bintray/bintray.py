@@ -1705,3 +1705,21 @@ class Bintray(object):
         response = self._requester.delete(url)
         self._logger.info("Delete successfully")
         return response
+
+    def get_all_team_permissions(self, subject, repo):
+        """ Get the permissions defined for teams on the specified repository
+
+            This resource is only available to Bintray Premium users.
+            For organization, caller must be an admin of the organization.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :return: request response
+        """
+        url = "{}/repos/{}/{}/permissions".format(Bintray.BINTRAY_URL, subject, repo)
+
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
