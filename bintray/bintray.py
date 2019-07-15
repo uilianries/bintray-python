@@ -1854,4 +1854,40 @@ class Bintray(object):
         self._logger.info("Create successfully")
         return response
 
+    def update_eula(self, subject, product, eula, syntax, content, versions, default=False):
+        """ Update a EULA under a specified subject and product.
+
+            A new EULA will apply to all new versions if the 'default' parameter is specified.
+
+            This resource is only available to Bintray Enterprise users.
+
+            Security: Authenticated user with 'read' permission for private repositories, or
+                      repository read entitlement.
+
+        :param subject: repository owner
+        :param product: product name
+        :param eula: EULA name
+        :param syntax: EULA syntax [markdown/asciidoc/plain_text default markdown]
+        :param content: EULA content
+        :param versions: product versions to use this new EULA
+        :param default: True if all product versions should use same EULA.
+        :return: request response
+        """
+        url = "{}/products/{}/{}/eulas/{}".format(Bintray.BINTRAY_URL, subject, product, eula)
+        json_data = {}
+        if isinstance(syntax, str):
+            json_data["syntax"] = syntax
+        if isinstance(content, str):
+            json_data["content"] = content
+        if isinstance(default, bool):
+            json_data["default"] = default
+        if isinstance(versions, list):
+            json_data["versions"] = versions
+        if not json_data:
+            raise ValueError("At lease one parameter must be filled.")
+
+        response = self._requester.patch(url, json=json_data)
+        self._logger.info("Create successfully")
+        return response
+
 
