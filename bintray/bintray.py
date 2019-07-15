@@ -1603,3 +1603,70 @@ class Bintray(object):
         response = self._requester.post(url, json=json_data)
         self._logger.info("Create successfully")
         return response
+
+    def update_org_team(self, org, team, members=None, allow_repo_creation=None, business_unit=None):
+        """ Update a team associated with an organization
+
+            This resource is only available to Bintray Premium users.
+            For organization, caller must be an admin of the organization.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param org: organization name
+        :param team: team name
+        :param members: list of members to be associated to the team
+        :param allow_repo_creation: team members are allowed to create and update repositories.
+        :param business_unit: a default business unit can be associated to a team and will be the
+                              default business unit for all repositories that are created by this
+                              team. A business unit can only be associated with a team if its
+                              members are allowed to create repositories.
+        :return: request response
+        """
+        url = "{}/orgs/{}/teams/{}".format(Bintray.BINTRAY_URL, org, team)
+        json_data = {}
+        if isinstance(members, list):
+            json_data['members'] = members
+        if isinstance(allow_repo_creation, bool):
+            json_data['allow_repo_creation'] = allow_repo_creation
+        if isinstance(business_unit, str):
+            json_data['business_unit'] = business_unit
+        if not json_data:
+            raise ValueError("At lease one parameter must be filled.")
+
+        response = self._requester.patch(url, json=json_data)
+        self._logger.info("Update successfully")
+        return response
+
+    def update_user_team(self, user, team, members=None, allow_repo_creation=None,
+                         business_unit=None):
+        """ Update a team associated with an user
+
+            This resource is only available to Bintray Premium users.
+            For organization, caller must be an admin of the organization.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param user: user name
+        :param team: team name
+        :param members: list of members to be associated to the team
+        :param allow_repo_creation: team members are allowed to create and update repositories.
+        :param business_unit: a default business unit can be associated to a team and will be the
+                              default business unit for all repositories that are created by this
+                              team. A business unit can only be associated with a team if its
+                              members are allowed to create repositories.
+        :return: request response
+        """
+        url = "{}/users/{}/teams/{}".format(Bintray.BINTRAY_URL, user, team)
+        json_data = {}
+        if isinstance(members, list):
+            json_data['members'] = members
+        if isinstance(allow_repo_creation, bool):
+            json_data['allow_repo_creation'] = allow_repo_creation
+        if isinstance(business_unit, str):
+            json_data['business_unit'] = business_unit
+        if not json_data:
+            raise ValueError("At lease one parameter must be filled.")
+
+        response = self._requester.patch(url, json=json_data)
+        self._logger.info("Update successfully")
+        return response

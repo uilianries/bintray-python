@@ -58,3 +58,22 @@ def test_create_team():
         error_message = str(error)
     assert "Could not POST (403): 403 Client Error: Forbidden for url: " \
            "https://api.bintray.com/orgs/jfrog/teams" == error_message
+
+
+def test_update_team():
+    bintray = Bintray()
+    error_message = ""
+
+    try:
+        bintray.update_user_team("uilianries", "foobar", ["uilianries"], True, "foobar")
+    except Exception as error:
+        error_message = str(error)
+    assert "Could not PATCH (404): 404 Client Error: Not Found for url: " \
+           "https://api.bintray.com/users/uilianries/teams/foobar" == error_message
+
+    try:
+        bintray.update_org_team("jfrog", "bintray", ["uilianries"], True, "foobar")
+    except Exception as error:
+        error_message = str(error)
+    assert "Could not PATCH (404): 404 Client Error: Not Found for url: " \
+           "https://api.bintray.com/orgs/jfrog/teams/bintray" == error_message
