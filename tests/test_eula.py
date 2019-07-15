@@ -47,3 +47,14 @@ def test_update_eula():
         error_message = str(error)
     assert "Could not PATCH (404): 404 Client Error: Not Found for url: " \
            "https://api.bintray.com/products/uilianries/generic/eulas/eula" == error_message
+
+
+def test_delete_eula():
+    bintray = Bintray()
+    error_message = ""
+    try:
+        bintray.delete_eula("uilianries", "generic", "eula")
+    except Exception as error:
+        error_message = str(error)
+    assert "Could not DELETE (404): 404 Client Error: Not Found for url: " \
+           "https://api.bintray.com/products/uilianries/generic/eulas/eula" == error_message

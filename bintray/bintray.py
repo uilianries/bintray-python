@@ -1828,8 +1828,7 @@ class Bintray(object):
 
             This resource is only available to Bintray Enterprise users.
 
-            Security: Authenticated user with 'read' permission for private repositories, or
-                      repository read entitlement.
+            Security: Authenticated user with 'admin' permission.
 
         :param subject: repository owner
         :param product: product name
@@ -1861,8 +1860,7 @@ class Bintray(object):
 
             This resource is only available to Bintray Enterprise users.
 
-            Security: Authenticated user with 'read' permission for private repositories, or
-                      repository read entitlement.
+            Security: Authenticated user with 'admin' permission.
 
         :param subject: repository owner
         :param product: product name
@@ -1890,4 +1888,20 @@ class Bintray(object):
         self._logger.info("Create successfully")
         return response
 
+    def delete_eula(self, subject, product, eula):
+        """ Delete the specified EULA under the specified subject and product.
 
+            This resource is only available to Bintray Enterprise users.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param product: product name
+        :param eula: eula name to be removed
+        :return: request response
+        """
+        url = "{}/products/{}/{}/eulas/{}".format(Bintray.BINTRAY_URL, subject, product, eula)
+
+        response = self._requester.delete(url)
+        self._logger.info("Delete successfully")
+        return response
