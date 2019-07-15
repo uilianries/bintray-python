@@ -1742,3 +1742,25 @@ class Bintray(object):
         response = self._requester.get(url)
         self._logger.info("Get successfully")
         return response
+
+    def set_team_permissions(self, subject, repo, team, permission):
+        """ Set the permissions defined for a team on the specified repository.
+
+
+            This resource is only available to Bintray Premium users.
+            For organization, caller must be an admin of the organization.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param team: team name
+        :param permission: permission type e.g. "read", "write"
+        :return: request response
+        """
+        url = "{}/repos/{}/{}/permissions".format(Bintray.BINTRAY_URL, subject, repo)
+        json_data = {"team": team, "permission": permission}
+
+        response = self._requester.put(url, json=json_data)
+        self._logger.info("Set successfully")
+        return response

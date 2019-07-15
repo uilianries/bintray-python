@@ -120,3 +120,15 @@ def test_get_team_permissions():
         error_message = str(error)
     assert "Could not GET (400): 400 Client Error: Bad Request for url: " \
            "https://api.bintray.com/repos/uilianries/generic/permissions/foobar" == error_message
+
+
+def test_set_team_permissions():
+    bintray = Bintray()
+    error_message = ""
+
+    try:
+        bintray.set_team_permissions("uilianries", "generic", "foobar", "read")
+    except Exception as error:
+        error_message = str(error)
+    assert "Could not PUT (400): 400 Client Error: Bad Request for url: " \
+           "https://api.bintray.com/repos/uilianries/generic/permissions" == error_message
