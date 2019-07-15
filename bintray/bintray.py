@@ -1504,3 +1504,41 @@ class Bintray(object):
         response = self._requester.get(url)
         self._logger.info("Get successfully")
         return response
+
+    def get_org_team(self, org, team):
+        """ Get details of a team associated with an organization
+
+
+            This resource is only available to Bintray Premium users.
+            For organization, caller must be an admin of the organization.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param org: organization name
+        :param team: team name
+        :return: team details
+        """
+        url = "{}/orgs/{}/teams/{}".format(Bintray.BINTRAY_URL, org, team)
+
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def get_user_team(self, user, team):
+        """ Get details of a team associated with an user
+
+
+            This resource is only available to Bintray Premium users.
+            For organization, caller must be an admin of the organization.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param user: user name
+        :param team: team name
+        :return: team details
+        """
+        url = "{}/users/{}/teams/{}".format(Bintray.BINTRAY_URL, user, team)
+
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
