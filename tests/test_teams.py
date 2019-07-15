@@ -77,3 +77,22 @@ def test_update_team():
         error_message = str(error)
     assert "Could not PATCH (404): 404 Client Error: Not Found for url: " \
            "https://api.bintray.com/orgs/jfrog/teams/bintray" == error_message
+
+
+def test_delete_team():
+    bintray = Bintray()
+    error_message = ""
+
+    try:
+        bintray.delete_user_team("uilianries", "foobar")
+    except Exception as error:
+        error_message = str(error)
+    assert "Could not DELETE (404): 404 Client Error: Not Found for url: " \
+           "https://api.bintray.com/users/uilianries/teams/foobar" == error_message
+
+    try:
+        bintray.delete_org_team("jfrog", "bintray",)
+    except Exception as error:
+        error_message = str(error)
+    assert "Could not DELETE (404): 404 Client Error: Not Found for url: " \
+           "https://api.bintray.com/orgs/jfrog/teams/bintray" == error_message

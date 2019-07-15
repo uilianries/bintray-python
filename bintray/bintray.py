@@ -1466,7 +1466,7 @@ class Bintray(object):
         url = "{}/webhooks/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, package)
 
         response = self._requester.delete(url)
-        self._logger.info("Get successfully")
+        self._logger.info("Delete successfully")
         return response
 
     # Teams
@@ -1669,4 +1669,39 @@ class Bintray(object):
 
         response = self._requester.patch(url, json=json_data)
         self._logger.info("Update successfully")
+        return response
+
+    def delete_org_team(self, org, team):
+        """ Delete a team associated with an organization
+
+            This resource is only available to Bintray Premium users.
+            For organization, caller must be an admin of the organization.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param org: organization name
+        :param team: team name
+        :return: request response
+        """
+        url = "{}/orgs/{}/teams/{}".format(Bintray.BINTRAY_URL, org, team)
+
+        response = self._requester.delete(url)
+        self._logger.info("Delete successfully")
+        return response
+
+    def delete_user_team(self, user, team):
+        """ Delete a team associated with an user
+
+            This resource is only available to Bintray Premium users.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param user: user name
+        :param team: team name
+        :return: request response
+        """
+        url = "{}/users/{}/teams/{}".format(Bintray.BINTRAY_URL, user, team)
+
+        response = self._requester.delete(url)
+        self._logger.info("Delete successfully")
         return response
