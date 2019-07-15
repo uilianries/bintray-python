@@ -1466,5 +1466,318 @@ class Bintray(object):
         url = "{}/webhooks/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, package)
 
         response = self._requester.delete(url)
+        self._logger.info("Delete successfully")
+        return response
+
+    # Teams
+
+    def get_org_teams(self, org):
+        """ Get a list of teams associated with an organization
+
+            This resource is only available to Bintray Premium users.
+            For organization, caller must be an admin of the organization.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param org: organization name
+        :return: team list
+        """
+        url = "{}/orgs/{}/teams".format(Bintray.BINTRAY_URL, org)
+
+        response = self._requester.get(url)
         self._logger.info("Get successfully")
+        return response
+
+    def get_user_teams(self, user):
+        """ Get a list of teams associated with an user
+
+            This resource is only available to Bintray Premium users.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param user: user name
+        :return: team list
+        """
+        url = "{}/users/{}/teams".format(Bintray.BINTRAY_URL, user)
+
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def get_org_team(self, org, team):
+        """ Get details of a team associated with an organization
+
+
+            This resource is only available to Bintray Premium users.
+            For organization, caller must be an admin of the organization.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param org: organization name
+        :param team: team name
+        :return: team details
+        """
+        url = "{}/orgs/{}/teams/{}".format(Bintray.BINTRAY_URL, org, team)
+
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def get_user_team(self, user, team):
+        """ Get details of a team associated with an user
+
+            This resource is only available to Bintray Premium users.
+            For organization, caller must be an admin of the organization.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param user: user name
+        :param team: team name
+        :return: team details
+        """
+        url = "{}/users/{}/teams/{}".format(Bintray.BINTRAY_URL, user, team)
+
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def create_org_team(self, org, name, members, allow_repo_creation=True, business_unit=None):
+        """ Create a new team for an organization
+
+            This resource is only available to Bintray Premium users.
+            For organization, caller must be an admin of the organization.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param org: organization name
+        :param name: team name
+        :param members: list of members to be associated to the team
+        :param allow_repo_creation: team members are allowed to create and update repositories.
+        :param business_unit: a default business unit can be associated to a team and will be the
+                              default business unit for all repositories that are created by this
+                              team. A business unit can only be associated with a team if its
+                              members are allowed to create repositories.
+        :return: request response
+        """
+        url = "{}/orgs/{}/teams".format(Bintray.BINTRAY_URL, org)
+        json_data = {
+            'name': name,
+            'members': members,
+            'allow_repo_creation': allow_repo_creation
+        }
+        if isinstance(business_unit, str):
+            json_data['business_unit'] = business_unit
+
+        response = self._requester.post(url, json=json_data)
+        self._logger.info("Create successfully")
+        return response
+
+    def create_user_team(self, user, name, members, allow_repo_creation=True, business_unit=None):
+        """ Create a new team for an user
+
+            This resource is only available to Bintray Premium users.
+            For organization, caller must be an admin of the organization.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param org: organization name
+        :param name: team name
+        :param members: list of members to be associated to the team
+        :param allow_repo_creation: team members are allowed to create and update repositories.
+        :param business_unit: a default business unit can be associated to a team and will be the
+                              default business unit for all repositories that are created by this
+                              team. A business unit can only be associated with a team if its
+                              members are allowed to create repositories.
+        :return: request response
+        """
+        url = "{}/users/{}/teams".format(Bintray.BINTRAY_URL, user)
+        json_data = {
+            'name': name,
+            'members': members,
+            'allow_repo_creation': allow_repo_creation
+        }
+        if isinstance(business_unit, str):
+            json_data['business_unit'] = business_unit
+
+        response = self._requester.post(url, json=json_data)
+        self._logger.info("Create successfully")
+        return response
+
+    def update_org_team(self, org, team, members=None, allow_repo_creation=None, business_unit=None):
+        """ Update a team associated with an organization
+
+            This resource is only available to Bintray Premium users.
+            For organization, caller must be an admin of the organization.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param org: organization name
+        :param team: team name
+        :param members: list of members to be associated to the team
+        :param allow_repo_creation: team members are allowed to create and update repositories.
+        :param business_unit: a default business unit can be associated to a team and will be the
+                              default business unit for all repositories that are created by this
+                              team. A business unit can only be associated with a team if its
+                              members are allowed to create repositories.
+        :return: request response
+        """
+        url = "{}/orgs/{}/teams/{}".format(Bintray.BINTRAY_URL, org, team)
+        json_data = {}
+        if isinstance(members, list):
+            json_data['members'] = members
+        if isinstance(allow_repo_creation, bool):
+            json_data['allow_repo_creation'] = allow_repo_creation
+        if isinstance(business_unit, str):
+            json_data['business_unit'] = business_unit
+        if not json_data:
+            raise ValueError("At lease one parameter must be filled.")
+
+        response = self._requester.patch(url, json=json_data)
+        self._logger.info("Update successfully")
+        return response
+
+    def update_user_team(self, user, team, members=None, allow_repo_creation=None,
+                         business_unit=None):
+        """ Update a team associated with an user
+
+            This resource is only available to Bintray Premium users.
+            For organization, caller must be an admin of the organization.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param user: user name
+        :param team: team name
+        :param members: list of members to be associated to the team
+        :param allow_repo_creation: team members are allowed to create and update repositories.
+        :param business_unit: a default business unit can be associated to a team and will be the
+                              default business unit for all repositories that are created by this
+                              team. A business unit can only be associated with a team if its
+                              members are allowed to create repositories.
+        :return: request response
+        """
+        url = "{}/users/{}/teams/{}".format(Bintray.BINTRAY_URL, user, team)
+        json_data = {}
+        if isinstance(members, list):
+            json_data['members'] = members
+        if isinstance(allow_repo_creation, bool):
+            json_data['allow_repo_creation'] = allow_repo_creation
+        if isinstance(business_unit, str):
+            json_data['business_unit'] = business_unit
+        if not json_data:
+            raise ValueError("At lease one parameter must be filled.")
+
+        response = self._requester.patch(url, json=json_data)
+        self._logger.info("Update successfully")
+        return response
+
+    def delete_org_team(self, org, team):
+        """ Delete a team associated with an organization
+
+            This resource is only available to Bintray Premium users.
+            For organization, caller must be an admin of the organization.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param org: organization name
+        :param team: team name
+        :return: request response
+        """
+        url = "{}/orgs/{}/teams/{}".format(Bintray.BINTRAY_URL, org, team)
+
+        response = self._requester.delete(url)
+        self._logger.info("Delete successfully")
+        return response
+
+    def delete_user_team(self, user, team):
+        """ Delete a team associated with an user
+
+            This resource is only available to Bintray Premium users.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param user: user name
+        :param team: team name
+        :return: request response
+        """
+        url = "{}/users/{}/teams/{}".format(Bintray.BINTRAY_URL, user, team)
+
+        response = self._requester.delete(url)
+        self._logger.info("Delete successfully")
+        return response
+
+    def get_all_team_permissions(self, subject, repo):
+        """ Get the permissions defined for teams on the specified repository
+
+            This resource is only available to Bintray Premium users.
+            For organization, caller must be an admin of the organization.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :return: request response
+        """
+        url = "{}/repos/{}/{}/permissions".format(Bintray.BINTRAY_URL, subject, repo)
+
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def get_team_permissions(self, subject, repo, team):
+        """ Get the permissions defined for a team on the specified repository
+
+            This resource is only available to Bintray Premium users.
+            For organization, caller must be an admin of the organization.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param team: team name
+        :return: request response
+        """
+        url = "{}/repos/{}/{}/permissions/{}".format(Bintray.BINTRAY_URL, subject, repo, team)
+
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def set_team_permissions(self, subject, repo, team, permission):
+        """ Set the permissions defined for a team on the specified repository.
+
+
+            This resource is only available to Bintray Premium users.
+            For organization, caller must be an admin of the organization.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param team: team name
+        :param permission: permission type e.g. "read", "write"
+        :return: request response
+        """
+        url = "{}/repos/{}/{}/permissions".format(Bintray.BINTRAY_URL, subject, repo)
+        json_data = {"team": team, "permission": permission}
+
+        response = self._requester.put(url, json=json_data)
+        self._logger.info("Set successfully")
+        return response
+
+    def delete_team_permission(self, subject, repo, team):
+        """ Delete the permission defined for a team on the specified repository
+
+            This resource is only available to Bintray Premium users.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param team: team name
+        :return: request response
+        """
+        url = "{}/repos/{}/{}/permissions/{}".format(Bintray.BINTRAY_URL, subject, repo, team)
+
+        response = self._requester.delete(url)
+        self._logger.info("Delete successfully")
         return response
