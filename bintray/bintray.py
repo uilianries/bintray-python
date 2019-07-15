@@ -1527,7 +1527,6 @@ class Bintray(object):
     def get_user_team(self, user, team):
         """ Get details of a team associated with an user
 
-
             This resource is only available to Bintray Premium users.
             For organization, caller must be an admin of the organization.
 
@@ -1541,4 +1540,66 @@ class Bintray(object):
 
         response = self._requester.get(url)
         self._logger.info("Get successfully")
+        return response
+
+    def create_org_team(self, org, name, members, allow_repo_creation=True, business_unit=None):
+        """ Create a new team for an organization
+
+            This resource is only available to Bintray Premium users.
+            For organization, caller must be an admin of the organization.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param org: organization name
+        :param name: team name
+        :param members: list of members to be associated to the team
+        :param allow_repo_creation: team members are allowed to create and update repositories.
+        :param business_unit: a default business unit can be associated to a team and will be the
+                              default business unit for all repositories that are created by this
+                              team. A business unit can only be associated with a team if its
+                              members are allowed to create repositories.
+        :return: request response
+        """
+        url = "{}/orgs/{}/teams".format(Bintray.BINTRAY_URL, org)
+        json_data = {
+            'name': name,
+            'members': members,
+            'allow_repo_creation': allow_repo_creation
+        }
+        if isinstance(business_unit, str):
+            json_data['business_unit'] = business_unit
+
+        response = self._requester.post(url, json=json_data)
+        self._logger.info("Create successfully")
+        return response
+
+    def create_user_team(self, user, name, members, allow_repo_creation=True, business_unit=None):
+        """ Create a new team for an user
+
+            This resource is only available to Bintray Premium users.
+            For organization, caller must be an admin of the organization.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param org: organization name
+        :param name: team name
+        :param members: list of members to be associated to the team
+        :param allow_repo_creation: team members are allowed to create and update repositories.
+        :param business_unit: a default business unit can be associated to a team and will be the
+                              default business unit for all repositories that are created by this
+                              team. A business unit can only be associated with a team if its
+                              members are allowed to create repositories.
+        :return: request response
+        """
+        url = "{}/users/{}/teams".format(Bintray.BINTRAY_URL, user)
+        json_data = {
+            'name': name,
+            'members': members,
+            'allow_repo_creation': allow_repo_creation
+        }
+        if isinstance(business_unit, str):
+            json_data['business_unit'] = business_unit
+
+        response = self._requester.post(url, json=json_data)
+        self._logger.info("Create successfully")
         return response
