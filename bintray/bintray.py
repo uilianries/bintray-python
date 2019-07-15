@@ -1468,3 +1468,39 @@ class Bintray(object):
         response = self._requester.delete(url)
         self._logger.info("Get successfully")
         return response
+
+    # Teams
+
+    # GET /orgs/:org/teams
+    def get_org_teams(self, org):
+        """ Get a list of teams associated with an organization
+
+            This resource is only available to Bintray Premium users.
+            For organization, caller must be an admin of the organization.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param org: organization name
+        :return: team list
+        """
+        url = "{}/orgs/{}/teams".format(Bintray.BINTRAY_URL, org)
+
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def get_user_teams(self, user):
+        """ Get a list of teams associated with an user
+
+            This resource is only available to Bintray Premium users.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param user: user name
+        :return: team list
+        """
+        url = "{}/users/{}/teams".format(Bintray.BINTRAY_URL, user)
+
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
