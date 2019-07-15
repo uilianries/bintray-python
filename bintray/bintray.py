@@ -1821,4 +1821,37 @@ class Bintray(object):
         self._logger.info("Get successfully")
         return response
 
+    def create_eula(self, subject, product, name, syntax, content, versions, default=False):
+        """ Create a EULA for the given subject, with the given product.
+
+            A new EULA will apply to all new versions if the 'default' parameter is specified.
+
+            This resource is only available to Bintray Enterprise users.
+
+            Security: Authenticated user with 'read' permission for private repositories, or
+                      repository read entitlement.
+
+        :param subject: repository owner
+        :param product: product name
+        :param name: EULA name
+        :param syntax: EULA syntax [markdown/asciidoc/plain_text default markdown]
+        :param content: EULA content
+        :param versions: product versions to use this new EULA
+        :param default: True if all product versions should use same EULA.
+        :return: request response
+        """
+        url = "{}/products/{}/{}/eulas".format(Bintray.BINTRAY_URL, subject, product)
+        json_data = {
+            "name": name,
+            "syntax": syntax,
+            "content": content,
+            "default": default
+        }
+        if isinstance(versions, list):
+            json_data["versions"] = versions
+
+        response = self._requester.post(url, json=json_data)
+        self._logger.info("Create successfully")
+        return response
+
 
