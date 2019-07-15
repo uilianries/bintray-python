@@ -1471,7 +1471,6 @@ class Bintray(object):
 
     # Teams
 
-    # GET /orgs/:org/teams
     def get_org_teams(self, org):
         """ Get a list of teams associated with an organization
 
