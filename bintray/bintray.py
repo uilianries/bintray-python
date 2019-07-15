@@ -1781,3 +1781,44 @@ class Bintray(object):
         response = self._requester.delete(url)
         self._logger.info("Delete successfully")
         return response
+
+    # EULAs (This resource is only available to Bintray Enterprise users.)
+
+    def get_eulas(self, subject, product):
+        """ Get a list of EULAs for the specified product.
+
+            This resource is only available to Bintray Enterprise users.
+
+            Security: Authenticated user with 'read' permission for private repositories, or
+                      repository read entitlement.
+
+        :param subject: repository owner
+        :param product: product name
+        :return: List of EULAs
+        """
+        url = "{}/products/{}/{}/eulas".format(Bintray.BINTRAY_URL, subject, product)
+
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def get_eula(self, subject, product, eula):
+        """ Returns the specified product EULA.
+
+            This resource is only available to Bintray Enterprise users.
+
+            Security: Authenticated user with 'read' permission for private repositories, or
+                      repository read entitlement.
+
+        :param subject: repository owner
+        :param product: product name
+        :param eula: EULA name
+        :return: Dictionary with EULA details
+        """
+        url = "{}/products/{}/{}/eulas/{}".format(Bintray.BINTRAY_URL, subject, product, eula)
+
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+
