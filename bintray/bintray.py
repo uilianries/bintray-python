@@ -83,7 +83,7 @@ class Bintray(object):
                                                               version)
         return self._requester.get(url, parameters)
 
-    def file_search_by_name(self, name, subject=None, repo=None, start_pos=None,
+    def search_file_by_name(self, name, subject=None, repo=None, start_pos=None,
                             created_after=None):
         """ Search for a file by its name. name can take the * and ? wildcard characters.
 
@@ -114,7 +114,7 @@ class Bintray(object):
         url = "{}/search/file".format(Bintray.BINTRAY_URL)
         return self._requester.get(url, parameters)
 
-    def file_search_by_checksum(self, sha1, subject=None, repo=None, start_pos=None,
+    def search_file_by_checksum(self, sha1, subject=None, repo=None, start_pos=None,
                             created_after=None):
         """ Search for a file by its sha1 checksum.
 
@@ -1922,4 +1922,250 @@ class Bintray(object):
 
         response = self._requester.post(url)
         self._logger.info("Generate successfully")
+        return response
+
+    # Attributes
+
+    def get_attributes(self, subject, repo, package, version=None, attributes=None):
+        """ Get attributes associated with the specified package or version.
+
+            If no attribute names are specified, return all attributes.
+
+            Note: Dates are defined in ISO8601 format.
+
+            Security: Authenticated user with 'read' permission for private repositories,
+                      or version/package read entitlement for the corresponding calls.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param version: package version (optional)
+        :param attributes: attributes to be listed
+        :return: a list of attributes
+        """
+        url = "{}/packages/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, package)
+        if version:
+            url += "/versions/{}".format(version)
+        url += "/attributes"
+
+        params = None
+        if attributes:
+            params = {"names": ",".join(attributes)}
+
+        response = self._requester.get(url, params=params)
+        self._logger.info("Get successfully")
+        return response
+
+    def set_attributes(self, subject, repo, package, version=None, attributes=None):
+        """ Associate attributes with the specified package or version, overriding all previous
+            attributes.
+
+            Optionally, specify an attribute type. Otherwise, type will be inferred from the
+            attribute’s value. If a type cannot be inferred, string type will be used.
+            Non-homogeneous arrays are not accepted. Attributes names beginning with an underscore
+            ("_") will only be visible for users with publish rights. Attribute types can be one of
+            the following: string, date, number, boolean, version version currently behaves like
+            string. This will change with future Bintray versions.
+
+            Security: Authenticated user with 'publish' permission for private repositories, or
+                      version/package read/write entitlement for the corresponding calls.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param version: package version (optional)
+        :param attributes: attributes to be configured [{"name":"att1", "values":["val1"],
+                                                         "type": "string"}]
+        :return: request response
+        """
+        url = "{}/packages/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, package)
+        if version:
+            url += "/versions/{}".format(version)
+        url += "/attributes"
+
+        response = self._requester.post(url, json=attributes)
+        self._logger.info("Set successfully")
+        return response
+
+    def update_attributes(self, subject, repo, package, version=None, attributes=None):
+        """ Update attributes associated with the specified package or version.
+
+            Attributes may have a null value. Optionally, specify an attribute type. Otherwise,
+            type will be inferred from the attribute’s value. If a type cannot be inferred, string
+            type will be used. Non-homogeneous arrays are not accepted. Attribute types can be one
+            of the following: string, date, number, boolean, version version currently behaves like
+            string. This will change with future Bintray versions.
+
+            Security: Authenticated user with 'publish' permission for private repositories, or
+                      version/package read/write entitlement for the corresponding calls.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param version: package version (optional)
+        :param attributes: attributes to be configured [{"name":"att1", "values":["val1"],
+                                                         "type": "string"}]
+        :return: request response
+        """
+        url = "{}/packages/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, package)
+        if version:
+            url += "/versions/{}".format(version)
+        url += "/attributes"
+
+        response = self._requester.patch(url, json=attributes)
+        self._logger.info("Update successfully")
+        return response
+
+    def delete_attributes(self, subject, repo, package, version=None, attributes=None):
+        """ Delete attributes associated with the specified repo, package or version.
+
+            If no attribute names are specified, delete all attributes.
+
+            Security: Authenticated user with 'publish' permission for private repositories, or
+                      version/package read/write entitlement for the corresponding calls.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param version: package version (optional)
+        :param attributes: attributes to be deleted [{"name":"att1", "values":["val1"],
+                                                         "type": "string"}]
+        :return: request response
+        """
+        url = "{}/packages/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, package)
+        if version:
+            url += "/versions/{}".format(version)
+        url += "/attributes"
+
+        params = {"names": ",".join(attributes)}
+
+        response = self._requester.delete(url, params=params)
+        self._logger.info("Delete successfully")
+        return response
+
+    def search_attributes(self, subject, repo, package=None, attributes=None,
+                          attribute_values=True):
+        """ Search for packages/versions inside a given repository matching a set of attributes.
+
+            The AND operator will be used when using multiple query clauses, for example attribute
+            A equals X and attribute B is greater than Z When an array value is used, if the
+            existing attribute value is a scalar match against one of the array values; if the
+            existing attribute value is an array check that the existing array contains the query
+            array.
+
+            Note: The values range is defined by the brackets direction and the comma position.
+
+            Security: Authenticated user with 'publish' permission for private repositories, or
+                      version/package read/write entitlement for the corresponding calls.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param version: package version (optional)
+        :param attributes: attributes to be searched
+        :param attribute_values: True to search attribute values
+        :return: Returns an array of results
+        """
+        url = "{}/search/attributes/{}/{}".format(Bintray.BINTRAY_URL, subject, repo)
+        if package:
+            url += "/{}/versions".format(package)
+
+        params = {"attribute_values": bool_to_number(attribute_values)}
+
+        response = self._requester.post(url, params=params, json=attributes)
+        self._logger.info("Search successfully")
+        return response
+
+    def get_file_attributes(self, subject, repo, file_path):
+        """ Returns all the attributes related to Artifact.
+
+            This resource can be consumed by both authenticated and anonymous users.
+
+            Security: Authenticated user with 'read' permission, or repository read entitlement for
+                      repository path.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param file_path: file to be checked
+        :return: a list of attributes
+        """
+        url = "{}/files/{}/{}/{}/attributes".format(Bintray.BINTRAY_URL, subject, repo, file_path)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def set_file_attributes(self, subject, repo, file_path, attributes):
+        """ Set attributes associated with the specified Artifact.
+
+            Overriding all previous attributes.
+
+            Security: Authenticated user with 'publish' permission, or write entitlement for
+                      repository path.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param file_path: file to be checked
+        :param attributes: attributes to be configured
+        :return: request response
+        """
+        url = "{}/files/{}/{}/{}/attributes".format(Bintray.BINTRAY_URL, subject, repo, file_path)
+        response = self._requester.post(url, json=attributes)
+        self._logger.info("Set successfully")
+        return response
+
+    def update_file_attributes(self, subject, repo, file_path, attributes):
+        """ Update the Artifact with new attributes without removing the older Artifact’s attributes
+
+            Security: Authenticated user with 'publish' permission, or write entitlement for
+                      repository path.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param file_path: file to be checked
+        :param attributes: attributes to be configured
+        :return: request response
+        """
+        url = "{}/files/{}/{}/{}/attributes".format(Bintray.BINTRAY_URL, subject, repo, file_path)
+        response = self._requester.patch(url, json=attributes)
+        self._logger.info("Set successfully")
+        return response
+
+    def delete_file_attributes(self, subject, repo, file_path, attributes):
+        """ Remove attributes associated with the specified Artifact.
+
+            By default, delete all attributes related to the specified Artifact.
+            The ‘names’ parameter is optional, and is used to remove specific attributes only.
+
+            Security: Authenticated user with 'publish' permission, or write entitlement for
+                      repository path.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param file_path: file to be checked
+        :param attributes: attributes to be deleted
+        :return: request response
+        """
+        url = "{}/files/{}/{}/{}/attributes".format(Bintray.BINTRAY_URL, subject, repo, file_path)
+        params = {"names": ",".join(attributes)}
+        response = self._requester.delete(url, params=params)
+        self._logger.info("Set successfully")
+        return response
+
+    def search_file_attributes(self, subject, repo, attributes):
+        """ Returns all artifacts in the specified repository that at least one of their attributes
+            correspond to names and values specified in the JSON payload.
+
+            Note: The values range is defined by the brackets direction and the comma position.
+
+            Security: Authenticated user with 'read' permission, or repository read
+                      entitlement for repository path.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param attributes: attributes to be searched
+        :return: request response
+        """
+        url = "{}/files/{}/{}/search/attributes".format(Bintray.BINTRAY_URL, subject, repo)
+        response = self._requester.post(url, json=attributes)
+        self._logger.info("Search successfully")
         return response
