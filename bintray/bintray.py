@@ -2129,3 +2129,24 @@ class Bintray(object):
         response = self._requester.patch(url, json=attributes)
         self._logger.info("Set successfully")
         return response
+
+    def delete_file_attributes(self, subject, repo, file_path, attributes):
+        """ Remove attributes associated with the specified Artifact.
+
+            By default, delete all attributes related to the specified Artifact.
+            The ‘names’ parameter is optional, and is used to remove specific attributes only.
+
+            Security: Authenticated user with 'publish' permission, or write entitlement for
+                      repository path.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param file_path: file to be checked
+        :param attributes: attributes to be deleted
+        :return: request response
+        """
+        url = "{}/files/{}/{}/{}/attributes".format(Bintray.BINTRAY_URL, subject, repo, file_path)
+        params = {"names": ",".join(attributes)}
+        response = self._requester.delete(url, params=params)
+        self._logger.info("Set successfully")
+        return response

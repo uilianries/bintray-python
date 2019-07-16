@@ -77,3 +77,13 @@ def test_update_files_attributes():
     response = bintray.update_file_attributes("uilianries", "generic", "packages.json", attributes)
     assert [{'name': 'att1', 'type': 'STRING', 'values': ['val3']},
             {'error': False, 'statusCode': 200}] == response
+
+
+def test_delete_file_attributes(create_attributes):
+    bintray = Bintray()
+    attributes = ["att1"]
+    response = bintray.delete_file_attributes("uilianries", "generic", "packages.json", attributes)
+    assert {'error': False,
+            'message': 'Attributes were deleted successfully from the following file path: '
+                       'packages.json',
+            'statusCode': 200} == response
