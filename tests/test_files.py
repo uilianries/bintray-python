@@ -61,7 +61,7 @@ def test_bad_credentials_for_get_version_files():
 
 def test_file_search_by_name():
     bintray = Bintray()
-    response = bintray.file_search_by_name("packages.json", subject="uilianries", repo="generic")
+    response = bintray.search_file_by_name("packages.json", subject="uilianries", repo="generic")
     assert {'error': False, 'statusCode': 200} in response
     assert {'created': '2019-07-01T20:51:42.879Z',
             'name': 'packages.json',
