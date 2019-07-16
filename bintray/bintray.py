@@ -2112,3 +2112,20 @@ class Bintray(object):
         response = self._requester.post(url, json=attributes)
         self._logger.info("Set successfully")
         return response
+
+    def update_file_attributes(self, subject, repo, file_path, attributes):
+        """ Update the Artifact with new attributes without removing the older Artifact’s attributes
+
+            Security: Authenticated user with 'publish' permission, or write entitlement for
+                      repository path.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param file_path: file to be checked
+        :param attributes: attributes to be configured
+        :return: request response
+        """
+        url = "{}/files/{}/{}/{}/attributes".format(Bintray.BINTRAY_URL, subject, repo, file_path)
+        response = self._requester.patch(url, json=attributes)
+        self._logger.info("Set successfully")
+        return response

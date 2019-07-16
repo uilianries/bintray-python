@@ -69,3 +69,11 @@ def test_set_files_attributes():
     response = bintray.set_file_attributes("uilianries", "generic", "packages.json", attributes)
     assert [{'name': 'att1', 'type': 'STRING', 'values': ['val2']},
             {'error': False, 'statusCode': 200}] == response
+
+
+def test_update_files_attributes():
+    bintray = Bintray()
+    attributes = [{"name": "att1", "values": ["val3"], "type": "string"}]
+    response = bintray.update_file_attributes("uilianries", "generic", "packages.json", attributes)
+    assert [{'name': 'att1', 'type': 'STRING', 'values': ['val3']},
+            {'error': False, 'statusCode': 200}] == response
