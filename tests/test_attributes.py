@@ -87,3 +87,16 @@ def test_delete_file_attributes(create_attributes):
             'message': 'Attributes were deleted successfully from the following file path: '
                        'packages.json',
             'statusCode': 200} == response
+
+
+def test_search_file_attributes():
+    bintray = Bintray()
+    attributes = [{"name": "att1"}]
+    error_message = ""
+    try:
+        bintray.search_file_attributes("uilianries", "generic", attributes)
+    except Exception as error:
+        error_message = str(error)
+
+    assert "Could not POST (400): 400 Client Error: Bad Request for url: " \
+           "https://api.bintray.com/files/uilianries/generic/search/attributes" == error_message

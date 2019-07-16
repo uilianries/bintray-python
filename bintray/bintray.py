@@ -2150,3 +2150,22 @@ class Bintray(object):
         response = self._requester.delete(url, params=params)
         self._logger.info("Set successfully")
         return response
+
+    def search_file_attributes(self, subject, repo, attributes):
+        """ Returns all artifacts in the specified repository that at least one of their attributes
+            correspond to names and values specified in the JSON payload.
+
+            Note: The values range is defined by the brackets direction and the comma position.
+
+            Security: Authenticated user with 'read' permission, or repository read
+                      entitlement for repository path.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param attributes: attributes to be searched
+        :return: request response
+        """
+        url = "{}/files/{}/{}/search/attributes".format(Bintray.BINTRAY_URL, subject, repo)
+        response = self._requester.post(url, json=attributes)
+        self._logger.info("Search successfully")
+        return response
