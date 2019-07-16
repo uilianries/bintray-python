@@ -83,7 +83,7 @@ class Bintray(object):
                                                               version)
         return self._requester.get(url, parameters)
 
-    def file_search_by_name(self, name, subject=None, repo=None, start_pos=None,
+    def search_file_by_name(self, name, subject=None, repo=None, start_pos=None,
                             created_after=None):
         """ Search for a file by its name. name can take the * and ? wildcard characters.
 
@@ -114,7 +114,7 @@ class Bintray(object):
         url = "{}/search/file".format(Bintray.BINTRAY_URL)
         return self._requester.get(url, parameters)
 
-    def file_search_by_checksum(self, sha1, subject=None, repo=None, start_pos=None,
+    def search_file_by_checksum(self, sha1, subject=None, repo=None, start_pos=None,
                             created_after=None):
         """ Search for a file by its sha1 checksum.
 
@@ -2041,4 +2041,37 @@ class Bintray(object):
 
         response = self._requester.delete(url, params=params)
         self._logger.info("Delete successfully")
+        return response
+
+    def search_attributes(self, subject, repo, package=None, attributes=None,
+                          attribute_values=True):
+        """ Search for packages/versions inside a given repository matching a set of attributes.
+
+            The AND operator will be used when using multiple query clauses, for example attribute
+            A equals X and attribute B is greater than Z When an array value is used, if the
+            existing attribute value is a scalar match against one of the array values; if the
+            existing attribute value is an array check that the existing array contains the query
+            array.
+
+            Note: The values range is defined by the brackets direction and the comma position.
+
+            Security: Authenticated user with 'publish' permission for private repositories, or
+                      version/package read/write entitlement for the corresponding calls.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param version: package version (optional)
+        :param attributes: attributes to be searched
+        :param attribute_values: True to search attribute values
+        :return: Returns an array of results
+        """
+        url = "{}/search/attributes/{}/{}".format(Bintray.BINTRAY_URL, subject, repo)
+        if package:
+            url += "/{}/versions".format(package)
+
+        params = {"attribute_values": bool_to_number(attribute_values)}
+
+        response = self._requester.post(url, params=params, json=attributes)
+        self._logger.info("Search successfully")
         return response

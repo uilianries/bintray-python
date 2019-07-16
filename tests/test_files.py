@@ -79,7 +79,7 @@ def test_bad_credentials_file_search_by_name():
     bintray = Bintray("foobar", "85abc6aece02515e8bd87b9754a18af697527d88")
     error_message = ""
     try:
-        bintray.file_search_by_name("packages.json", subject="uilianries", repo="generic")
+        bintray.search_file_by_name("packages.json", subject="uilianries", repo="generic")
     except Exception as error:
         error_message = str(error)
     assert "Could not GET (401): 401 Client Error: Unauthorized for url: " \
@@ -89,7 +89,7 @@ def test_bad_credentials_file_search_by_name():
 
 def test_file_search_by_checksum():
     bintray = Bintray()
-    response = bintray.file_search_by_checksum("85abc6aece02515e8bd87b9754a18af697527d88",
+    response = bintray.search_file_by_checksum("85abc6aece02515e8bd87b9754a18af697527d88",
                                                subject="uilianries", repo="generic",
                                                created_after="2019-07-01")
     assert {'error': False, 'statusCode': 200} in response
@@ -99,7 +99,7 @@ def test_bad_credentials_file_search_by_checksum():
     bintray = Bintray("foobar", "85abc6aece02515e8bd87b9754a18af697527d88")
     error_message = ""
     try:
-        bintray.file_search_by_checksum(
+        bintray.search_file_by_checksum(
             "85abc6aece02515e8bd87b9754a18af697527d88",
             subject="uilianries", repo="generic")
     except Exception as error:

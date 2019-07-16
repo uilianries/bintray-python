@@ -40,4 +40,11 @@ def test_delete_attributes(create_attributes):
     bintray = Bintray()
     attributes = ["att1"]
     response = bintray.delete_attributes("uilianries", "generic", "statistics", "test", attributes)
-    assert {'error': False, 'statusCode': 200} == response
+    assert {'error': False, 'message': 'success', 'statusCode': 200} == response
+
+
+def test_search_attributes(create_attributes):
+    bintray = Bintray()
+    attributes = [{"att1": ["val1", "val2"]}]
+    response = bintray.search_attributes("uilianries", "generic", "statistics", attributes)
+    assert {'error': False, 'statusCode': 200} in response
