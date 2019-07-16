@@ -1923,3 +1923,35 @@ class Bintray(object):
         response = self._requester.post(url)
         self._logger.info("Generate successfully")
         return response
+
+    # Attributes
+
+    def get_attributes(self, subject, repo, package, version=None, attributes=None):
+        """ Get attributes associated with the specified package or version.
+
+            If no attribute names are specified, return all attributes.
+
+            Note: Dates are defined in ISO8601 format.
+
+            Security: Authenticated user with 'read' permission for private repositories,
+                      or version/package read entitlement for the corresponding calls.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param version: package version (optional)
+        :param attributes: attributes to be listed
+        :return: a list of attributes
+        """
+        url = "{}/packages/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, package)
+        if version:
+            url += "/versions/{}".format(version)
+        url += "/attributes"
+
+        params = None
+        if attributes:
+            params = {"names": ",".join(attributes)}
+
+        response = self._requester.get(url, params=params)
+        self._logger.info("Get successfully")
+        return response
