@@ -12,6 +12,14 @@ def create_attributes():
     return response
 
 
+@pytest.fixture()
+def create_file_attributes():
+    bintray = Bintray()
+    attributes = [{"name": "att1", "values": ["val1"], "type": "string"}]
+    response = bintray.set_file_attributes("uilianries", "generic", "packages.json", attributes)
+    return response
+
+
 def test_get_attributes(create_attributes):
     bintray = Bintray()
     response = bintray.get_attributes("uilianries", "generic", "statistics", "test")
@@ -50,7 +58,14 @@ def test_search_attributes(create_attributes):
     assert {'error': False, 'statusCode': 200} in response
 
 
-def test_get_files_attributes():
+def test_get_files_attributes(create_file_attributes):
+    assert [{'name': 'att1', 'type': 'STRING', 'values': ['val1']},
+            {'error': False, 'statusCode': 200}] == create_file_attributes
+
+
+def test_set_files_attributes():
     bintray = Bintray()
-    response = bintray.get_file_attributes("uilianries", "generic", "packages.json")
-    assert [{'error': False, 'statusCode': 200}] == response
+    attributes = [{"name": "att1", "values": ["val2"], "type": "string"}]
+    response = bintray.set_file_attributes("uilianries", "generic", "packages.json", attributes)
+    assert [{'name': 'att1', 'type': 'STRING', 'values': ['val2']},
+            {'error': False, 'statusCode': 200}] == response

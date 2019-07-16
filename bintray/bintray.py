@@ -2093,3 +2093,22 @@ class Bintray(object):
         response = self._requester.get(url)
         self._logger.info("Get successfully")
         return response
+
+    def set_file_attributes(self, subject, repo, file_path, attributes):
+        """ Set attributes associated with the specified Artifact.
+
+            Overriding all previous attributes.
+
+            Security: Authenticated user with 'publish' permission, or write entitlement for
+                      repository path.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param file_path: file to be checked
+        :param attributes: attributes to be configured
+        :return: request response
+        """
+        url = "{}/files/{}/{}/{}/attributes".format(Bintray.BINTRAY_URL, subject, repo, file_path)
+        response = self._requester.post(url, json=attributes)
+        self._logger.info("Set successfully")
+        return response
