@@ -1956,7 +1956,7 @@ class Bintray(object):
         self._logger.info("Get successfully")
         return response
 
-    def set_attributes(self, subject, repo, package, version=None, attributes=[]):
+    def set_attributes(self, subject, repo, package, version=None, attributes=None):
         """ Associate attributes with the specified package or version, overriding all previous
             attributes.
 
@@ -1985,4 +1985,33 @@ class Bintray(object):
 
         response = self._requester.post(url, json=attributes)
         self._logger.info("Set successfully")
+        return response
+
+    def update_attributes(self, subject, repo, package, version=None, attributes=None):
+        """ Update attributes associated with the specified package or version.
+
+            Attributes may have a null value. Optionally, specify an attribute type. Otherwise,
+            type will be inferred from the attribute’s value. If a type cannot be inferred, string
+            type will be used. Non-homogeneous arrays are not accepted. Attribute types can be one
+            of the following: string, date, number, boolean, version version currently behaves like
+            string. This will change with future Bintray versions.
+
+            Security: Authenticated user with 'publish' permission for private repositories, or
+                      version/package read/write entitlement for the corresponding calls.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param version: package version (optional)
+        :param attributes: attributes to be configured [{"name":"att1", "values":["val1"],
+                                                         "type": "string"}]
+        :return: request response
+        """
+        url = "{}/packages/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, package)
+        if version:
+            url += "/versions/{}".format(version)
+        url += "/attributes"
+
+        response = self._requester.patch(url, json=attributes)
+        self._logger.info("Update successfully")
         return response

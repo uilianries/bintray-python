@@ -26,3 +26,11 @@ def test_get_attributes(create_attributes):
 def test_set_attributes(create_attributes):
     assert [{'name': 'att1', 'type': 'string', 'values': ['val1']},
             {'error': False, 'statusCode': 200}] == create_attributes
+
+
+def test_update_attributes(create_attributes):
+    bintray = Bintray()
+    attributes = [{"name": "att1", "values": ["val2"], "type": "string"}]
+    response = bintray.update_attributes("uilianries", "generic", "statistics", "test", attributes)
+    assert [{'name': 'att1', 'type': 'string', 'values': ['val2']},
+            {'error': False, 'statusCode': 200}] == response
