@@ -2015,3 +2015,30 @@ class Bintray(object):
         response = self._requester.patch(url, json=attributes)
         self._logger.info("Update successfully")
         return response
+
+    def delete_attributes(self, subject, repo, package, version=None, attributes=None):
+        """ Delete attributes associated with the specified repo, package or version.
+
+            If no attribute names are specified, delete all attributes.
+
+            Security: Authenticated user with 'publish' permission for private repositories, or
+                      version/package read/write entitlement for the corresponding calls.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param version: package version (optional)
+        :param attributes: attributes to be deleted [{"name":"att1", "values":["val1"],
+                                                         "type": "string"}]
+        :return: request response
+        """
+        url = "{}/packages/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, package)
+        if version:
+            url += "/versions/{}".format(version)
+        url += "/attributes"
+
+        params = {"names": ",".join(attributes)}
+
+        response = self._requester.delete(url, params=params)
+        self._logger.info("Delete successfully")
+        return response

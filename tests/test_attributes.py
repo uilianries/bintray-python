@@ -34,3 +34,10 @@ def test_update_attributes(create_attributes):
     response = bintray.update_attributes("uilianries", "generic", "statistics", "test", attributes)
     assert [{'name': 'att1', 'type': 'string', 'values': ['val2']},
             {'error': False, 'statusCode': 200}] == response
+
+
+def test_delete_attributes(create_attributes):
+    bintray = Bintray()
+    attributes = ["att1"]
+    response = bintray.delete_attributes("uilianries", "generic", "statistics", "test", attributes)
+    assert {'error': False, 'statusCode': 200} == response
