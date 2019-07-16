@@ -2075,3 +2075,21 @@ class Bintray(object):
         response = self._requester.post(url, params=params, json=attributes)
         self._logger.info("Search successfully")
         return response
+
+    def get_file_attributes(self, subject, repo, file_path):
+        """ Returns all the attributes related to Artifact.
+
+            This resource can be consumed by both authenticated and anonymous users.
+
+            Security: Authenticated user with 'read' permission, or repository read entitlement for
+                      repository path.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param file_path: file to be checked
+        :return: a list of attributes
+        """
+        url = "{}/files/{}/{}/{}/attributes".format(Bintray.BINTRAY_URL, subject, repo, file_path)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response

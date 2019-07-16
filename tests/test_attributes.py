@@ -48,3 +48,9 @@ def test_search_attributes(create_attributes):
     attributes = [{"att1": ["val1", "val2"]}]
     response = bintray.search_attributes("uilianries", "generic", "statistics", attributes)
     assert {'error': False, 'statusCode': 200} in response
+
+
+def test_get_files_attributes():
+    bintray = Bintray()
+    response = bintray.get_file_attributes("uilianries", "generic", "packages.json")
+    assert [{'error': False, 'statusCode': 200}] == response
