@@ -2838,3 +2838,28 @@ class Bintray(object):
         response = self._requester.delete(url)
         self._logger.info("Delete successfully")
         return response
+
+    # Packages
+
+    def get_packages(self, subject, repo, start_pos=None, start_name=None):
+        """ Get a list of packages in the specified repository.
+
+            Security: Authenticated user with 'read' permission, or repository read entitlement.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param start_pos: starting position filter
+        :param start_name: name prefix filter
+        :return: list of packages
+        """
+        url = "{}/repos/{}/{}/packages".format(Bintray.BINTRAY_URL, subject, repo)
+        params = {}
+        if start_pos:
+            params["start_pos"] = start_pos
+        if start_name:
+            params["start_name"] = start_name
+        response = self._requester.get(url, params=params)
+        self._logger.info("Get successfully")
+        return response
+
+
