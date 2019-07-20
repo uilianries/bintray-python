@@ -2377,3 +2377,18 @@ class Bintray(object):
         response = self._requester.post(url, json=json_data)
         self._logger.info("Post successfully")
         return response
+
+    # Logs (This resource is only available to Bintray Premium users.)
+
+    def get_list_package_download_log_files(self, subject, repo, package):
+        """ Retrieve a list of available download log files for a package
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :return: response request
+        """
+        url = "{}/packages/{}/{}/{}/logs".format(Bintray.BINTRAY_URL, subject, repo, package)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
