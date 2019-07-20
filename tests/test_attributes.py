@@ -79,7 +79,7 @@ def test_update_files_attributes():
             {'error': False, 'statusCode': 200}] == response
 
 
-def test_delete_file_attributes(create_attributes):
+def test_delete_file_attributes(create_file_attributes):
     bintray = Bintray()
     attributes = ["att1"]
     response = bintray.delete_file_attributes("uilianries", "generic", "packages.json", attributes)
