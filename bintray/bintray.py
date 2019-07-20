@@ -2925,3 +2925,25 @@ class Bintray(object):
         """
         return self._get_custom_downloads(subject, repo, package, "country_downloads", version,
                                           from_date, to_date)
+
+    def get_usage_report_for_subject(self, subject, from_date=None, to_date=None):
+        """ Get monthly download and storage usage report, according to the specified date range
+            for a subject.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param from_date: initial date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+        :param to_date: end date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+        :return: download details
+        """
+        url = "{}/usage/{}".format(Bintray.BINTRAY_URL, subject)
+        json_data = {}
+        if from_date:
+            json_data["from"] = from_date
+        if to_date:
+            json_data["to"] = to_date
+
+        response = self._requester.post(url, json=json_data)
+        self._logger.info("Search successfully")
+        return response
