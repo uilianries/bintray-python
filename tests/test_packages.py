@@ -1,6 +1,16 @@
 from bintray.bintray import Bintray
 
 
+def _create_package():
+    bintray = Bintray()
+    response = bintray.create_package("uilianries", "generic", "qux", ["MIT"],
+                                      "https://github.com/uilianries/bintray-python", None, "foo",
+                                      ["test", "jfrog", "couse"], "http://example.com",
+                                      "https://github.com/uilianries/bintray-python/issues",
+                                      "uilianries/bintray-python", None, True)
+    return response
+
+
 def test_get_packages():
     bintray = Bintray()
     response = bintray.get_packages("uilianries", "conan")
@@ -11,3 +21,29 @@ def test_get_package():
     bintray = Bintray()
     response = bintray.get_package("uilianries", "generic", "statistics")
     assert response["name"] == "statistics"
+
+
+def test_create_package():
+    bintray = Bintray()
+    try:
+        bintray.get_package("uilianries", "generic", "qux")
+        bintray.delete_package("uilianries", "generic", "qux")
+    except:
+        pass
+
+    response = _create_package()
+
+    assert response["name"] == "qux"
+    assert response["error"] == False
+
+
+def test_delete_package():
+    bintray = Bintray()
+    try:
+        _create_package()
+    except:
+        pass
+
+    response = bintray.delete_package("uilianries", "generic", "qux")
+
+    assert {'error': False, 'message': 'success', 'statusCode': 200} == response

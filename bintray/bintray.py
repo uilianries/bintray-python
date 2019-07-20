@@ -2879,4 +2879,73 @@ class Bintray(object):
         self._logger.info("Get successfully")
         return response
 
+    def create_package(self, subject, repo, package, licenses=None, vcs_url=None,
+                       custom_licenses=None, desc=None, labels=None, website_url=None,
+                       issue_tracker_url=None, github_repo=None, github_release_notes_file=None,
+                       public_download_numbers=None, public_stats=None):
+        """ Creates a new package in the specified repo (user has to be an owner of the repo)
+
+            Security: Authenticated user with 'publish' permission, or repository read/write
+                      entitlement.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param desc: package description
+        :param labels: package lables (tags)
+        :param licenses: list of licenses (mandatory for OSS packages)
+        :param custom_licenses: custom licenses (available only for Premium accounts)
+        :param vcs_url: VCS url (mandatory for OSS packages)
+        :param website_url: website url
+        :param issue_tracker_url: issue tracker url
+        :param github_repo: Github repository
+        :param github_release_notes_file: release notes on Github
+        :param public_download_numbers: display download number
+        :param public_stats: stats are public (available only for Premium accounts)
+        :return: request response
+        """
+        url = "{}/packages/{}/{}".format(Bintray.BINTRAY_URL, subject, repo)
+        json_data = {"name": package}
+        if desc:
+            json_data["desc"] = desc
+        if labels:
+            json_data["labels"] = labels
+        if licenses:
+            json_data["licenses"] = licenses
+        if custom_licenses:
+            json_data["custom_licenses"] = custom_licenses
+        if vcs_url:
+            json_data["vcs_url"] = vcs_url
+        if website_url:
+            json_data["website_url"] = website_url
+        if issue_tracker_url:
+            json_data["issue_tracker_url"] = issue_tracker_url
+        if github_repo:
+            json_data["github_repo"] = github_repo
+        if github_release_notes_file:
+            json_data["github_release_notes_file"] = github_release_notes_file
+        if public_download_numbers is not None:
+            json_data["public_download_numbers"] = public_download_numbers
+        if public_stats is not None:
+            json_data["public_stats"] = public_stats
+
+        response = self._requester.post(url, json=json_data)
+        self._logger.info("Post successfully")
+        return response
+
+    def delete_package(self, subject, repo, package):
+        """ Delete the specified package
+
+            Security: Security: Authenticated user with 'publish' permission, or repository
+                      ead/write entitlement.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :return: request response
+        """
+        url = "{}/packages/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, package)
+        response = self._requester.delete(url)
+        self._logger.info("Delete successfully")
+        return response
 
