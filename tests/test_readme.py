@@ -28,22 +28,20 @@ def test_create_product_readme():
     bintray = Bintray()
     error_message = ""
     try:
-        bintray.create_product_readme("uilianries", "generic",
+        bintray.create_product_readme("jfrog", "xray",
                                       github="uilianries/bintray-python")
     except Exception as error:
         error_message = str(error)
 
-    assert "Could not POST (404): 404 Client Error: Not Found for url: " \
-           "https://api.bintray.com/products/uilianries/generic/readme" == error_message
+    assert "Could not POST (403): forbidden" == error_message
 
 
 def test_delete_product_readme():
     bintray = Bintray()
     error_message = ""
     try:
-        bintray.delete_product_readme("uilianries", "generic")
+        bintray.delete_product_readme("jfrog", "xray")
     except Exception as error:
         error_message = str(error)
 
-    assert "Could not DELETE (404): 404 Client Error: Not Found for url: " \
-           "https://api.bintray.com/products/uilianries/generic/readme" == error_message
+    assert "Could not DELETE (403): forbidden" == error_message

@@ -19,9 +19,7 @@ def test_bad_credentials_for_upload_content():
         bintray.upload_content("uilianries", "generic", "statistics", "test", "test.txt", temp_path)
     except Exception as error:
         error_message = str(error)
-    assert "Could not PUT (401): 401 Client Error: Unauthorized for url: " \
-           "https://api.bintray.com/content/uilianries/generic/statistics/test/test.txt?" \
-           "publish=1&override=0&explode=0" == error_message
+    assert "Could not PUT (401): This resource requires authentication" == error_message
 
 
 def test_maven_upload():
@@ -33,9 +31,8 @@ def test_maven_upload():
                              temp_path, publish=True)
     except Exception as error:
         error_message = str(error)
-    assert "Could not PUT (400): 400 Client Error: Bad Request for url:" \
-           " https://api.bintray.com/maven/uilianries/generic/statistics/pom.xml" \
-           "?publish=1" == error_message
+    assert "Could not PUT (400): Provided artifact path does not comply with Maven's convention" \
+           == error_message
 
 
 def test_debian_upload():

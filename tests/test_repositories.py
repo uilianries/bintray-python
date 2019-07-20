@@ -85,9 +85,8 @@ def test_link_package():
         bintray.link_package("uilianries", "statistics", "uilianries", "generic", "statistics")
     except Exception as error:
         error_message = str(error)
-    assert "Could not PUT (403): 403 Client Error: Forbidden for url: " \
-            "https://api.bintray.com/repository/uilianries/statistics/links/" \
-            "uilianries/generic/statistics" == error_message
+    assert "Could not PUT (403): unable to create link for package statistics. can't create link " \
+           "between two owned repositories" == error_message
 
 
 def test_unlink_package():
@@ -97,9 +96,7 @@ def test_unlink_package():
         bintray.unlink_package("uilianries", "statistics", "uilianries", "generic", "statistics")
     except Exception as error:
         error_message = str(error)
-    assert "Could not DELETE (404): 404 Client Error: Not Found for url: " \
-            "https://api.bintray.com/repository/uilianries/statistics/links/" \
-            "uilianries/generic/statistics" == error_message
+    assert "Could not DELETE (404): Not Found" == error_message
 
 
 def test_schedule_metadata_calculation():
@@ -109,8 +106,8 @@ def test_schedule_metadata_calculation():
         bintray.schedule_metadata_calculation("uilianries", "generic")
     except Exception as error:
         error_message = str(error)
-    assert "Could not POST (400): 400 Client Error: Bad Request for url: " \
-           "https://api.bintray.com/calc_metadata/uilianries/generic" == error_message
+    assert "Could not POST (400): It is not possible to calculate index for Generic repositories." \
+           == error_message
 
 
 def test_get_geo_restrictions():
@@ -120,8 +117,8 @@ def test_get_geo_restrictions():
         bintray.get_geo_restrictions("uilianries", "generic")
     except Exception as error:
         error_message = str(error)
-    assert "Could not GET (403): 403 Client Error: Forbidden for url: " \
-           "https://api.bintray.com/repos/uilianries/generic/geo_restrictions" == error_message
+    assert "Could not GET (403): Account Plan is not suitable for repo geo restriction. " \
+           "Your current plan does not support geo restrictions." == error_message
 
 
 def test_update_geo_restrictions():
@@ -131,15 +128,15 @@ def test_update_geo_restrictions():
         bintray.update_geo_restrictions("uilianries", "generic", white_list=["US", "CA"])
     except Exception as error:
         error_message = str(error)
-    assert "Could not PUT (403): 403 Client Error: Forbidden for url: " \
-           "https://api.bintray.com/repos/uilianries/generic/geo_restrictions" == error_message
+    assert "Could not PUT (403): Account Plan is not suitable for repo geo restriction. " \
+           "Your current plan does not support geo restrictions." == error_message
 
     try:
         bintray.update_geo_restrictions("uilianries", "generic", black_list=["US", "CA"])
     except Exception as error:
         error_message = str(error)
-    assert "Could not PUT (403): 403 Client Error: Forbidden for url: " \
-           "https://api.bintray.com/repos/uilianries/generic/geo_restrictions" == error_message
+    assert "Could not PUT (403): Account Plan is not suitable for repo geo restriction. " \
+           "Your current plan does not support geo restrictions." == error_message
 
     try:
         bintray.update_geo_restrictions("uilianries", "generic")
@@ -162,8 +159,8 @@ def test_delete_geo_restrictions():
         bintray.delete_geo_restrictions("uilianries", "generic")
     except Exception as error:
         error_message = str(error)
-    assert "Could not DELETE (403): 403 Client Error: Forbidden for url: " \
-           "https://api.bintray.com/repos/uilianries/generic/geo_restrictions" == error_message
+    assert "Could not DELETE (403): Account Plan is not suitable for repo geo restriction. " \
+           "Your current plan does not support geo restrictions." == error_message
 
 
 def test_get_ip_restrictions():
@@ -184,8 +181,8 @@ def test_set_ip_restrictions():
                                     black_cidrs=["192.168.0.1/32"])
     except Exception as error:
         error_message = str(error)
-    assert "Could not PUT (403): 403 Client Error: Forbidden for url: " \
-           "https://api.bintray.com/repos/uilianries/generic/ip_restrictions" == error_message
+    assert "Could not PUT (403): Your repo commercial type does not support IP restrictions." \
+           == error_message
 
     try:
         bintray.set_ip_restrictions("uilianries", "generic")
@@ -204,8 +201,8 @@ def test_update_ip_restrictions():
                                        rm_black_cidrs=["192.168.0.2/32"])
     except Exception as error:
         error_message = str(error)
-    assert "Could not PATCH (403): 403 Client Error: Forbidden for url: " \
-           "https://api.bintray.com/repos/uilianries/generic/ip_restrictions" == error_message
+    assert "Could not PATCH (403): Your repo commercial type does not support IP restrictions." \
+           == error_message
 
     try:
         bintray.update_ip_restrictions("uilianries", "generic")
@@ -221,5 +218,5 @@ def test_delete_ip_restrictions():
         bintray.delete_ip_restrictions("uilianries", "generic")
     except Exception as error:
         error_message = str(error)
-    assert "Could not DELETE (403): 403 Client Error: Forbidden for url: " \
-           "https://api.bintray.com/repos/uilianries/generic/ip_restrictions" == error_message
+    assert "Could not DELETE (403): Your repo commercial type does not support IP restrictions." \
+           == error_message

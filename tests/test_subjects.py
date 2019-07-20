@@ -8,5 +8,5 @@ def test_regenerate_subject_url_signing_key():
         bintray.regenerate_subject_url_signing_key("uilianries")
     except Exception as error:
         error_message = str(error)
-    assert "Could not POST (400): 400 Client Error: Bad Request for url: " \
-           "https://api.bintray.com/subjects/uilianries/keypair" == error_message
+    assert "Could not POST (400): This action is not allowed for none-premium subject uilianries" \
+           == error_message

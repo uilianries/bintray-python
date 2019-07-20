@@ -5,11 +5,10 @@ def test_get_product_signed_eulas():
     bintray = Bintray()
     error_message = ""
     try:
-        bintray.get_product_signed_eulas("jfrog", "bintray")
+        bintray.get_product_signed_eulas("jfrog", "xray")
     except Exception as error:
         error_message = str(error)
-    assert "Could not GET (404): 404 Client Error: Not Found for url: " \
-           "https://api.bintray.com/products/jfrog/bintray/signed_eulas" == error_message
+    assert "Could not GET (403): forbidden" == error_message
 
 
 def test_get_all_products_signed_eulas():
@@ -19,5 +18,4 @@ def test_get_all_products_signed_eulas():
         bintray.get_all_products_signed_eulas("jfrog")
     except Exception as error:
         error_message = str(error)
-    assert "Could not GET (403): 403 Client Error: Forbidden for url: " \
-           "https://api.bintray.com/products/jfrog/_all/signed_eulas" == error_message
+    assert "Could not GET (403): forbidden" == error_message
