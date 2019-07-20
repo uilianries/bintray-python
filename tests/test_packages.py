@@ -61,5 +61,15 @@ def test_update_package():
                                       ["test", "jfrog", "couse"], "http://example.com",
                                       "https://github.com/uilianries/bintray-python/issues",
                                       "uilianries/bintray-python", None, True)
-
     assert {'error': False, 'message': 'success', 'statusCode': 200} == response
+
+
+def test_search_package():
+    bintray = Bintray()
+    try:
+        _create_package()
+    except:
+        pass
+
+    response = bintray.search_package("qux", "foo", "uilianries", "generic")
+    assert {'error': False, 'statusCode': 200} in response

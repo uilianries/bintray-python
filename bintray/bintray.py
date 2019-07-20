@@ -2936,7 +2936,7 @@ class Bintray(object):
     def delete_package(self, subject, repo, package):
         """ Delete the specified package
 
-            Security: Security: Authenticated user with 'publish' permission, or repository
+            Security: Authenticated user with 'publish' permission, or repository
                       ead/write entitlement.
 
         :param subject: repository owner
@@ -3003,4 +3003,32 @@ class Bintray(object):
 
         response = self._requester.patch(url, json=json_data)
         self._logger.info("Update successfully")
+        return response
+
+    def search_package(self, package=None, desc=None, subject=None, repo=None):
+        """ Search for a package.
+
+            Security: Non-authenticated user.
+
+        :param subject: repository owner to filter
+        :param repo: repository name to filter
+        :param package: package name to filter
+        :param desc: desc name to filter
+        :return: an array of results
+        """
+        url = "{}/search/packages".format(Bintray.BINTRAY_URL)
+        params = {}
+        if package:
+            params["name"] = package
+        if desc:
+            params["desc"] = desc
+        if subject:
+            params["subject"] = subject
+        if repo:
+            params["repo"] = repo
+        if not params:
+            raise ValueError("At lease one parameter must be filled.")
+
+        response = self._requester.get(url, params=params)
+        self._logger.info("Search successfully")
         return response
