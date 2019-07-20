@@ -31,3 +31,35 @@ def test_get_usage_threshold_business_unit():
     except Exception as error:
         error_message = str(error)
     assert "Could not GET (404): BusinessUnit 'conan' was not found" == error_message
+
+
+def test_create_usage_threshold_org():
+    bintray = Bintray()
+    error_message = ""
+    try:
+        bintray.create_usage_threshold_org("jfrog", 10000, 10000, 10000, ["user@mail.com"])
+    except Exception as error:
+        error_message = str(error)
+    assert "Could not POST (403): forbidden" == error_message
+
+
+def test_create_usage_threshold_repository():
+    bintray = Bintray()
+    error_message = ""
+    try:
+        bintray.create_usage_threshold_repository("jfrog", "xray", 10000, 10000, 10000,
+                                                  ["user@mail.com"])
+    except Exception as error:
+        error_message = str(error)
+    assert "Could not POST (403): forbidden" == error_message
+
+
+def test_create_usage_threshold_business_unit():
+    bintray = Bintray()
+    error_message = ""
+    try:
+        bintray.create_usage_threshold_business_unit("jfrog", "xray", 10000, 10000, 10000,
+                                                  ["user@mail.com"])
+    except Exception as error:
+        error_message = str(error)
+    assert "Could not POST (404): BusinessUnit 'xray' was not found" == error_message
