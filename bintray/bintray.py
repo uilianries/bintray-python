@@ -2377,3 +2377,42 @@ class Bintray(object):
         response = self._requester.post(url, json=json_data)
         self._logger.info("Post successfully")
         return response
+
+    # Logs (This resource is only available to Bintray Premium users.)
+
+    def get_list_package_download_log_files(self, subject, repo, package):
+        """ Retrieve a list of available download log files for a package
+
+            Security: Authenticated user with 'publish' permission, or package read/write
+                      entitlement.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :return: response request
+        """
+        url = "{}/packages/{}/{}/{}/logs".format(Bintray.BINTRAY_URL, subject, repo, package)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def download_package_download_log_file(self, subject, repo, package, remote_log_name,
+                                           local_log_name):
+        """ Download the package download log file specified by log_name
+
+            Security: Authenticated user with 'publish' permission, or package read/write
+                      entitlement.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param remote_log_name: log to be downloaded
+        :param local_log_name: log to be saved in local storage
+        :return: response request
+        """
+        url = "{}/packages/{}/{}/{}/logs/{}".format(Bintray.BINTRAY_URL, subject, repo, package,
+                                                    remote_log_name)
+        content = self._requester.download(url, add_status_code=False)
+        with open(local_log_name, 'wb') as local_fd:
+            local_fd.write(content)
+        self._logger.info("Download successfully")

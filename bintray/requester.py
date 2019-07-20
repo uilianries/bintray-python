@@ -61,17 +61,20 @@ class Requester(object):
         response, _ = self.download(url, params)
         return response
 
-    def download(self, url, params=None):
+    def download(self, url, params=None, add_status_code=True):
         """ Just like GET method, but with content
 
         :param url: URL Address
         :param params: URL parameters
+        :param add_status_code: add JSON return code
         :return: JSON response and content
         """
         response = requests.get(url, auth=self._get_authentication(), params=params)
         if not response.ok:
             self._raise_error("Could not GET", response)
-        return self._add_status_code(response), response.content
+        if add_status_code:
+            return self._add_status_code(response), response.content
+        return response.content
 
     def put(self, url, params=None, data=None, json=None, headers=None):
         """ Forward PUT method
