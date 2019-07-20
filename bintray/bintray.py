@@ -2431,3 +2431,19 @@ class Bintray(object):
         response = self._requester.get(url)
         self._logger.info("Get successfully")
         return response
+
+    # Product (This resource is only available to Bintray Enterprise Edition users.)
+
+    def get_products(self, subject):
+        """ Get a list of products for the specified subject.
+
+            Security: Authenticated user with 'read' permission for private repositories, or
+                      repository read entitlement.
+
+        :param subject: repository owner
+        :return: a list of products associated to the subject
+        """
+        url = "{}/products/{}".format(Bintray.BINTRAY_URL, subject)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
