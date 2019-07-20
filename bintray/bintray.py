@@ -2839,15 +2839,256 @@ class Bintray(object):
         self._logger.info("Delete successfully")
         return response
 
+    # Packages
+
+    def get_packages(self, subject, repo, start_pos=None, start_name=None):
+        """ Get a list of packages in the specified repository.
+
+            Security: Authenticated user with 'read' permission, or repository read entitlement.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param start_pos: starting position filter
+        :param start_name: name prefix filter
+        :return: list of packages
+        """
+        url = "{}/repos/{}/{}/packages".format(Bintray.BINTRAY_URL, subject, repo)
+        params = {}
+        if start_pos:
+            params["start_pos"] = start_pos
+        if start_name:
+            params["start_name"] = start_name
+        response = self._requester.get(url, params=params)
+        self._logger.info("Get successfully")
+        return response
+
+    def get_package(self, subject, repo, package, attribute_values=True):
+        """ Get general information about a specified package with package name.
+
+            Security: Non-authenticated user.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param attribute_values: show attribute values
+        :return: package details
+        """
+        url = "{}/packages/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, package)
+        params = {"attribute_values": bool_to_number(attribute_values)}
+        response = self._requester.get(url, params=params)
+        self._logger.info("Get successfully")
+        return response
+
+    def get_package_for_file(self, subject, repo, file_path):
+        """ Get general information about the package a repository file is associated with.
+
+            Security: Non-authenticated user.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param file_path: file path to be searched
+        :return: package details
+        """
+        url = "{}/file_package/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, file_path)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def search_maven_package(self, group_id=None, artifact_id=None, query=None, subject=None,
+                             repo=None):
+        """ Search for a Maven package using Maven groupId and artifactId
+
+            Security: Non-authenticated user.
+
+        :param group_id: maven group id
+        :param artifact_id: maven artifact id
+        :param query: wildcard query
+        :param subject: repository owner
+        :param repo: repository name
+        :return: package details
+        """
+        url = "{}/search/packages/maven".format(Bintray.BINTRAY_URL)
+        params = {}
+        if group_id:
+            params["g"] = group_id
+        if artifact_id:
+            params["a"] = group_id
+        if query:
+            params["q"] = query
+        if subject:
+            params["subject"] = subject
+        if repo:
+            params["repo"] = repo
+
+        if not params:
+            raise ValueError("At lease one parameter must be filled.")
+
+        response = self._requester.get(url, params=params)
+        self._logger.info("Get successfully")
+        return response
+
+    def create_package(self, subject, repo, package, licenses=None, vcs_url=None,
+                       custom_licenses=None, desc=None, labels=None, website_url=None,
+                       issue_tracker_url=None, github_repo=None, github_release_notes_file=None,
+                       public_download_numbers=None, public_stats=None):
+        """ Creates a new package in the specified repo (user has to be an owner of the repo)
+
+            Security: Authenticated user with 'publish' permission, or repository read/write
+                      entitlement.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param desc: package description
+        :param labels: package lables (tags)
+        :param licenses: list of licenses (mandatory for OSS packages)
+        :param custom_licenses: custom licenses (available only for Premium accounts)
+        :param vcs_url: VCS url (mandatory for OSS packages)
+        :param website_url: website url
+        :param issue_tracker_url: issue tracker url
+        :param github_repo: Github repository
+        :param github_release_notes_file: release notes on Github
+        :param public_download_numbers: display download number
+        :param public_stats: stats are public (available only for Premium accounts)
+        :return: request response
+        """
+        url = "{}/packages/{}/{}".format(Bintray.BINTRAY_URL, subject, repo)
+        json_data = {"name": package}
+        if desc:
+            json_data["desc"] = desc
+        if labels:
+            json_data["labels"] = labels
+        if licenses:
+            json_data["licenses"] = licenses
+        if custom_licenses:
+            json_data["custom_licenses"] = custom_licenses
+        if vcs_url:
+            json_data["vcs_url"] = vcs_url
+        if website_url:
+            json_data["website_url"] = website_url
+        if issue_tracker_url:
+            json_data["issue_tracker_url"] = issue_tracker_url
+        if github_repo:
+            json_data["github_repo"] = github_repo
+        if github_release_notes_file:
+            json_data["github_release_notes_file"] = github_release_notes_file
+        if public_download_numbers is not None:
+            json_data["public_download_numbers"] = public_download_numbers
+        if public_stats is not None:
+            json_data["public_stats"] = public_stats
+
+        response = self._requester.post(url, json=json_data)
+        self._logger.info("Post successfully")
+        return response
+
+    def delete_package(self, subject, repo, package):
+        """ Delete the specified package
+
+            Security: Authenticated user with 'publish' permission, or repository
+                      ead/write entitlement.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :return: request response
+        """
+        url = "{}/packages/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, package)
+        response = self._requester.delete(url)
+        self._logger.info("Delete successfully")
+        return response
+
+    def update_package(self, subject, repo, package, licenses=None, vcs_url=None,
+                       custom_licenses=None, desc=None, labels=None, website_url=None,
+                       issue_tracker_url=None, github_repo=None, github_release_notes_file=None,
+                       public_download_numbers=None, public_stats=None):
+        """ Update the information of the specified package.
+
+            Security: Authenticated user with 'publish' permission, or repository read/write
+                      entitlement.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param desc: package description
+        :param labels: package lables (tags)
+        :param licenses: list of licenses (mandatory for OSS packages)
+        :param custom_licenses: custom licenses (available only for Premium accounts)
+        :param vcs_url: VCS url (mandatory for OSS packages)
+        :param website_url: website url
+        :param issue_tracker_url: issue tracker url
+        :param github_repo: Github repository
+        :param github_release_notes_file: release notes on Github
+        :param public_download_numbers: display download number
+        :param public_stats: stats are public (available only for Premium accounts)
+        :return: request response
+        """
+        url = "{}/packages/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, package)
+        json_data = {}
+        if desc:
+            json_data["desc"] = desc
+        if labels:
+            json_data["labels"] = labels
+        if licenses:
+            json_data["licenses"] = licenses
+        if custom_licenses:
+            json_data["custom_licenses"] = custom_licenses
+        if vcs_url:
+            json_data["vcs_url"] = vcs_url
+        if website_url:
+            json_data["website_url"] = website_url
+        if issue_tracker_url:
+            json_data["issue_tracker_url"] = issue_tracker_url
+        if github_repo:
+            json_data["github_repo"] = github_repo
+        if github_release_notes_file:
+            json_data["github_release_notes_file"] = github_release_notes_file
+        if public_download_numbers is not None:
+            json_data["public_download_numbers"] = public_download_numbers
+        if public_stats is not None:
+            json_data["public_stats"] = public_stats
+        if not json_data:
+            raise ValueError("At lease one parameter must be filled.")
+
+        response = self._requester.patch(url, json=json_data)
+        self._logger.info("Update successfully")
+        return response
+
+    def search_package(self, package=None, desc=None, subject=None, repo=None):
+        """ Search for a package.
+
+            Security: Non-authenticated user.
+
+        :param subject: repository owner to filter
+        :param repo: repository name to filter
+        :param package: package name to filter
+        :param desc: desc name to filter
+        :return: an array of results
+        """
+        url = "{}/search/packages".format(Bintray.BINTRAY_URL)
+        params = {}
+        if package:
+            params["name"] = package
+        if desc:
+            params["desc"] = desc
+        if subject:
+            params["subject"] = subject
+        if repo:
+            params["repo"] = repo
+        if not params:
+            raise ValueError("At lease one parameter must be filled.")
+
+        response = self._requester.get(url, params=params)
+        self._logger.info("Search successfully")
+        return response
+
     # Statistics & Usage Report (This resource is only available for Bintray Premium accounts.)
 
-    def _get_custom_downloads(self, subject, repo, package, suffix, version=None, from_date=None,
+    def _get_custom_downloads(self, subject, repo, package, suffix, version=None,
+                              from_date=None,
                               to_date=None):
         """ Get number of downloads, for the passed time range, per package or per version.
-
             Security: Authenticated user with 'publish' permission for private repositories,
                       or package read/write entitlement.
-
         :param subject: repository owner
         :param repo: repository name
         :param package: package name
@@ -2875,10 +3116,8 @@ class Bintray(object):
     def get_daily_downloads(self, subject, repo, package, version=None, from_date=None,
                             to_date=None):
         """ Get number of downloads per day, for the passed time range, per package or per version.
-
             Security: Authenticated user with 'publish' permission for private repositories,
                       or package read/write entitlement.
-
         :param subject: repository owner
         :param repo: repository name
         :param package: package name
@@ -2887,16 +3126,15 @@ class Bintray(object):
         :param to_date: end date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
         :return: download details
         """
-        return self._get_custom_downloads(subject, repo, package, "time_range_downloads", version,
+        return self._get_custom_downloads(subject, repo, package, "time_range_downloads",
+                                          version,
                                           from_date, to_date)
 
     def get_total_downloads(self, subject, repo, package, version=None, from_date=None,
                             to_date=None):
         """ Get total number of downloads, for the passed time range, per package or per version.
-
             Security: Authenticated user with 'publish' permission for private repositories,
                       or package read/write entitlement.
-
         :param subject: repository owner
         :param repo: repository name
         :param package: package name
@@ -2911,10 +3149,8 @@ class Bintray(object):
     def get_downloads_by_country(self, subject, repo, package, version=None, from_date=None,
                                  to_date=None):
         """ Get total number of downloads, for the passed time range, per package or per version.
-
             Security: Authenticated user with 'publish' permission for private repositories,
                       or package read/write entitlement.
-
         :param subject: repository owner
         :param repo: repository name
         :param package: package name
@@ -2929,9 +3165,7 @@ class Bintray(object):
     def get_usage_report_for_subject(self, subject, from_date=None, to_date=None):
         """ Get monthly download and storage usage report, according to the specified date range
             for a subject.
-
             Security: Authenticated user with 'admin' permission.
-
         :param subject: repository owner
         :param from_date: initial date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
         :param to_date: end date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
@@ -2951,9 +3185,7 @@ class Bintray(object):
     def get_usage_report_for_repository(self, subject, repo, from_date=None, to_date=None):
         """ Get monthly download and storage usage report, according to the specified date range
             for a specific subject repository.
-
             Security: Authenticated user with 'admin' permission.
-
         :param subject: repository owner
         :param repo: repository name
         :param from_date: initial date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
@@ -2975,10 +3207,8 @@ class Bintray(object):
                                      from_date=None, to_date=None):
         """ Get current storage usage report. Report can be requested for the specified repository,
             optionally for a specific package.
-
             Security: Authenticated user with 'admin' permission for repo, or 'publish' permission
                       for specific package.
-
         :param subject: repository owner
         :param repo: repository name
         :param package: package name
@@ -3001,14 +3231,13 @@ class Bintray(object):
         self._logger.info("Search successfully")
         return response
 
-    def get_usage_report_grouped_by_business_unit(self, subject, business_unit=None, from_date=None,
+    def get_usage_report_grouped_by_business_unit(self, subject, business_unit=None,
+                                                  from_date=None,
                                                   to_date=None):
         """ Get monthly download and storage usage report, according to the specified date range
             and grouped by business unit. Report can be requested for a subject or for a specific
             subject business unit.
-
             Security: Authenticated user with 'admin' permission.
-
         :param subject: repository owner
         :param business_unit: business unit name
         :param from_date: initial date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
