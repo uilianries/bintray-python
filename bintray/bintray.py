@@ -2894,6 +2894,39 @@ class Bintray(object):
         self._logger.info("Get successfully")
         return response
 
+    def search_maven_package(self, group_id=None, artifact_id=None, query=None, subject=None,
+                             repo=None):
+        """ Search for a Maven package using Maven groupId and artifactId
+
+            Security: Non-authenticated user.
+
+        :param group_id: maven group id
+        :param artifact_id: maven artifact id
+        :param query: wildcard query
+        :param subject: repository owner
+        :param repo: repository name
+        :return: package details
+        """
+        url = "{}/search/packages/maven".format(Bintray.BINTRAY_URL)
+        params = {}
+        if group_id:
+            params["g"] = group_id
+        if artifact_id:
+            params["a"] = group_id
+        if query:
+            params["q"] = query
+        if subject:
+            params["subject"] = subject
+        if repo:
+            params["repo"] = repo
+
+        if not params:
+            raise ValueError("At lease one parameter must be filled.")
+
+        response = self._requester.get(url, params=params)
+        self._logger.info("Get successfully")
+        return response
+
     def create_package(self, subject, repo, package, licenses=None, vcs_url=None,
                        custom_licenses=None, desc=None, labels=None, website_url=None,
                        issue_tracker_url=None, github_repo=None, github_release_notes_file=None,
@@ -3047,5 +3080,3 @@ class Bintray(object):
         response = self._requester.get(url, params=params)
         self._logger.info("Search successfully")
         return response
-
-

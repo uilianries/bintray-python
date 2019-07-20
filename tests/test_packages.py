@@ -81,3 +81,11 @@ def test_get_package_for_file():
 
     assert response["name"] == "statistics"
     assert response["repo"] == "generic"
+
+
+def test_search_maven_package():
+    bintray = Bintray()
+    response = bintray.search_maven_package("com.jfrog.bintray.gradle", "*bintray*", None, "jfrog",
+                                            "jfrog-jars")
+
+    assert [{'error': False, 'statusCode': 200}] == response
