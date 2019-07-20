@@ -2548,3 +2548,293 @@ class Bintray(object):
         response = self._requester.delete(url)
         self._logger.info("Delete successfully")
         return response
+
+    # Usage Thresholds (This resource is only available for Bintray Enterprise accounts.)
+
+    def get_usage_threshold_org(self, org):
+        """ Get organization usage threshold
+
+            Security: Authenticated user with organization ‘admin’ permission.
+
+        :param org: organization name
+        :return: request response
+        """
+        url = "{}/usage_threshold/organization/{}".format(Bintray.BINTRAY_URL, org)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def get_usage_threshold_repository(self, org, repo):
+        """ Get repository organization usage threshold
+
+            Security: Authenticated user with organization ‘admin’ permission.
+
+        :param org: organization name
+        :param repo: repo name
+        :return: request response
+        """
+        url = "{}/usage_threshold/repo/{}/{}".format(Bintray.BINTRAY_URL, org, repo)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def get_usage_threshold_business_unit(self, org, business_unit):
+        """ Get business unit usage threshold
+
+            Security: Authenticated user with organization ‘admin’ permission.
+
+        :param org: organization name
+        :param business_unit: business unit name
+        :return: request response
+        """
+        url = "{}/usage_threshold/business_unit/{}/{}".format(Bintray.BINTRAY_URL, org,
+                                                              business_unit)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def create_usage_threshold_org(self, org, monthly_storage=None, monthly_download=None,
+                                   daily_download=None, alert_to_emails=None, alert_to_admins=True):
+        """ Create organization usage threshold
+
+            Security: Authenticated user with organization ‘admin’ permission.
+
+        :param org: organization name
+        :param monthly_storage: monthly storage in bytes
+        :param monthly_download: monthly download in bytes
+        :param daily_download: daily download in bytes
+        :param alert_to_emails: list of emails to receive alerts
+        :param alert_to_admins: send alerts to admins.
+        :return: request response
+        """
+        url = "{}/usage_threshold/organization/{}".format(Bintray.BINTRAY_URL, org)
+
+        json_data = {}
+        if monthly_storage:
+            json_data["monthly_storage_bytes"] = monthly_storage
+        if monthly_download:
+            json_data["monthly_download_bytes"] = monthly_download
+        if daily_download:
+            json_data["daily_download_bytes"] = daily_download
+        if alert_to_emails:
+            json_data["alert_to_emails"] = alert_to_emails
+        json_data["alert_to_admins"] = alert_to_admins
+
+        response = self._requester.post(url, json=json_data)
+
+        self._logger.info("Post successfully")
+        return response
+
+    def create_usage_threshold_repository(self, org, repo, monthly_storage=None,
+                                          monthly_download=None, daily_download=None,
+                                          alert_to_emails=None, alert_to_admins=True):
+        """ Create repository usage threshold
+
+            Security: Authenticated user with organization ‘admin’ permission.
+
+        :param org: organization name
+        :param repo: repository name
+        :param monthly_storage: monthly storage in bytes
+        :param monthly_download: monthly download in bytes
+        :param daily_download: daily download in bytes
+        :param alert_to_emails: list of emails to receive alerts
+        :param alert_to_admins: send alerts to admins.
+        :return: request response
+        """
+        url = "{}/usage_threshold/repo/{}/{}".format(Bintray.BINTRAY_URL, org, repo)
+
+        json_data = {}
+        if monthly_storage:
+            json_data["monthly_storage_bytes"] = monthly_storage
+        if monthly_download:
+            json_data["monthly_download_bytes"] = monthly_download
+        if daily_download:
+            json_data["daily_download_bytes"] = daily_download
+        if alert_to_emails:
+            json_data["alert_to_emails"] = alert_to_emails
+        json_data["alert_to_admins"] = alert_to_admins
+
+        response = self._requester.post(url, json=json_data)
+
+        self._logger.info("Post successfully")
+        return response
+
+    def create_usage_threshold_business_unit(self, org, business_unit, monthly_storage=None,
+                                             monthly_download=None, daily_download=None,
+                                             alert_to_emails=None, alert_to_admins=True):
+        """ Create usage threshold for business unit
+
+            Security: Authenticated user with organization ‘admin’ permission.
+
+        :param org: organization name
+        :param business_unit: business unit name
+        :param monthly_storage: monthly storage in bytes
+        :param monthly_download: monthly download in bytes
+        :param daily_download: daily download in bytes
+        :param alert_to_emails: list of emails to receive alerts
+        :param alert_to_admins: send alerts to admins.
+        :return: request response
+        """
+        url = "{}/usage_threshold/business_unit/{}/{}".format(Bintray.BINTRAY_URL, org,
+                                                              business_unit)
+
+        json_data = {}
+        if monthly_storage:
+            json_data["monthly_storage_bytes"] = monthly_storage
+        if monthly_download:
+            json_data["monthly_download_bytes"] = monthly_download
+        if daily_download:
+            json_data["daily_download_bytes"] = daily_download
+        if alert_to_emails:
+            json_data["alert_to_emails"] = alert_to_emails
+        json_data["alert_to_admins"] = alert_to_admins
+
+        response = self._requester.post(url, json=json_data)
+
+        self._logger.info("Post successfully")
+        return response
+
+    def update_usage_threshold_org(self, org, monthly_storage=None, monthly_download=None,
+                                   daily_download=None, alert_to_emails=None, alert_to_admins=None):
+        """ Update organization usage threshold
+
+            Security: Authenticated user with organization ‘admin’ permission.
+
+        :param org: organization name
+        :param monthly_storage: monthly storage in bytes
+        :param monthly_download: monthly download in bytes
+        :param daily_download: daily download in bytes
+        :param alert_to_emails: list of emails to receive alerts
+        :param alert_to_admins: send alerts to admins.
+        :return: request response
+        """
+        url = "{}/usage_threshold/organization/{}".format(Bintray.BINTRAY_URL, org)
+
+        json_data = {}
+        if monthly_storage:
+            json_data["monthly_storage_bytes"] = monthly_storage
+        if monthly_download:
+            json_data["monthly_download_bytes"] = monthly_download
+        if daily_download:
+            json_data["daily_download_bytes"] = daily_download
+        if alert_to_emails:
+            json_data["alert_to_emails"] = alert_to_emails
+        if alert_to_admins is not None:
+            json_data["alert_to_admins"] = alert_to_admins
+
+        response = self._requester.patch(url, json=json_data)
+
+        self._logger.info("Patch successfully")
+        return response
+
+    def update_usage_threshold_repository(self, org, repo, monthly_storage=None,
+                                          monthly_download=None, daily_download=None,
+                                          alert_to_emails=None, alert_to_admins=None):
+        """ Update repository usage threshold
+
+            Security: Authenticated user with organization ‘admin’ permission.
+
+        :param org: organization name
+        :param repo: repository name
+        :param monthly_storage: monthly storage in bytes
+        :param monthly_download: monthly download in bytes
+        :param daily_download: daily download in bytes
+        :param alert_to_emails: list of emails to receive alerts
+        :param alert_to_admins: send alerts to admins.
+        :return: request response
+        """
+        url = "{}/usage_threshold/repo/{}/{}".format(Bintray.BINTRAY_URL, org, repo)
+
+        json_data = {}
+        if monthly_storage:
+            json_data["monthly_storage_bytes"] = monthly_storage
+        if monthly_download:
+            json_data["monthly_download_bytes"] = monthly_download
+        if daily_download:
+            json_data["daily_download_bytes"] = daily_download
+        if alert_to_emails:
+            json_data["alert_to_emails"] = alert_to_emails
+        if alert_to_admins is not None:
+            json_data["alert_to_admins"] = alert_to_admins
+
+        response = self._requester.patch(url, json=json_data)
+
+        self._logger.info("Patch successfully")
+        return response
+
+    def update_usage_threshold_business_unit(self, org, business_unit, monthly_storage=None,
+                                             monthly_download=None, daily_download=None,
+                                             alert_to_emails=None, alert_to_admins=None):
+        """ Update usage threshold for business unit
+
+            Security: Authenticated user with organization ‘admin’ permission.
+
+        :param org: organization name
+        :param business_unit: business unit name
+        :param monthly_storage: monthly storage in bytes
+        :param monthly_download: monthly download in bytes
+        :param daily_download: daily download in bytes
+        :param alert_to_emails: list of emails to receive alerts
+        :param alert_to_admins: send alerts to admins.
+        :return: request response
+        """
+        url = "{}/usage_threshold/business_unit/{}/{}".format(Bintray.BINTRAY_URL, org,
+                                                              business_unit)
+        json_data = {}
+        if monthly_storage:
+            json_data["monthly_storage_bytes"] = monthly_storage
+        if monthly_download:
+            json_data["monthly_download_bytes"] = monthly_download
+        if daily_download:
+            json_data["daily_download_bytes"] = daily_download
+        if alert_to_emails:
+            json_data["alert_to_emails"] = alert_to_emails
+        if alert_to_admins is not None:
+            json_data["alert_to_admins"] = alert_to_admins
+
+        response = self._requester.patch(url, json=json_data)
+
+        self._logger.info("Patch successfully")
+        return response
+
+    def delete_usage_threshold_org(self, org):
+        """ Delete organization usage threshold
+
+            Security: Authenticated user with organization ‘admin’ permission.
+
+        :param org: organization name
+        :return: request response
+        """
+        url = "{}/usage_threshold/organization/{}".format(Bintray.BINTRAY_URL, org)
+        response = self._requester.delete(url)
+        self._logger.info("Delete successfully")
+        return response
+
+    def delete_usage_threshold_repository(self, org, repo):
+        """ Delete repository usage threshold
+
+            Security: Authenticated user with organization ‘admin’ permission.
+
+        :param org: organization name
+        :param repo: repository name
+        :return: request response
+        """
+        url = "{}/usage_threshold/repo/{}/{}".format(Bintray.BINTRAY_URL, org, repo)
+        response = self._requester.delete(url)
+        self._logger.info("Delete successfully")
+        return response
+
+    def delete_usage_threshold_business_unit(self, org, business_unit):
+        """ Delete usage threshold for business unit
+
+            Security: Authenticated user with organization ‘admin’ permission.
+
+        :param org: organization name
+        :param business_unit: business unit name
+        :return: request response
+        """
+        url = "{}/usage_threshold/business_unit/{}/{}".format(Bintray.BINTRAY_URL, org,
+                                                              business_unit)
+        response = self._requester.delete(url)
+        self._logger.info("Delete successfully")
+        return response
