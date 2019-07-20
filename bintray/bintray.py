@@ -3080,3 +3080,179 @@ class Bintray(object):
         response = self._requester.get(url, params=params)
         self._logger.info("Search successfully")
         return response
+
+    # Statistics & Usage Report (This resource is only available for Bintray Premium accounts.)
+
+    def _get_custom_downloads(self, subject, repo, package, suffix, version=None,
+                              from_date=None,
+                              to_date=None):
+        """ Get number of downloads, for the passed time range, per package or per version.
+            Security: Authenticated user with 'publish' permission for private repositories,
+                      or package read/write entitlement.
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param suffix: suffix name
+        :param version: package version (Optional)
+        :param from_date: initial date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+        :param to_date: end date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+        :return: download details
+        """
+        url = "{}/packages/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, package)
+        if version:
+            url += "/versions/{}/stats/{}".format(version, suffix)
+        else:
+            url += "/stats/{}".format(suffix)
+        json_data = {}
+        if from_date:
+            json_data["from"] = from_date
+        if to_date:
+            json_data["to"] = to_date
+
+        response = self._requester.post(url, json=json_data)
+        self._logger.info("Search successfully")
+        return response
+
+    def get_daily_downloads(self, subject, repo, package, version=None, from_date=None,
+                            to_date=None):
+        """ Get number of downloads per day, for the passed time range, per package or per version.
+            Security: Authenticated user with 'publish' permission for private repositories,
+                      or package read/write entitlement.
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param version: package version (Optional)
+        :param from_date: initial date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+        :param to_date: end date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+        :return: download details
+        """
+        return self._get_custom_downloads(subject, repo, package, "time_range_downloads",
+                                          version,
+                                          from_date, to_date)
+
+    def get_total_downloads(self, subject, repo, package, version=None, from_date=None,
+                            to_date=None):
+        """ Get total number of downloads, for the passed time range, per package or per version.
+            Security: Authenticated user with 'publish' permission for private repositories,
+                      or package read/write entitlement.
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param version: package version (Optional)
+        :param from_date: initial date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+        :param to_date: end date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+        :return: download details
+        """
+        return self._get_custom_downloads(subject, repo, package, "total_downloads", version,
+                                          from_date, to_date)
+
+    def get_downloads_by_country(self, subject, repo, package, version=None, from_date=None,
+                                 to_date=None):
+        """ Get total number of downloads, for the passed time range, per package or per version.
+            Security: Authenticated user with 'publish' permission for private repositories,
+                      or package read/write entitlement.
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param version: package version (Optional)
+        :param from_date: initial date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+        :param to_date: end date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+        :return: download details
+        """
+        return self._get_custom_downloads(subject, repo, package, "country_downloads", version,
+                                          from_date, to_date)
+
+    def get_usage_report_for_subject(self, subject, from_date=None, to_date=None):
+        """ Get monthly download and storage usage report, according to the specified date range
+            for a subject.
+            Security: Authenticated user with 'admin' permission.
+        :param subject: repository owner
+        :param from_date: initial date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+        :param to_date: end date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+        :return: download details
+        """
+        url = "{}/usage/{}".format(Bintray.BINTRAY_URL, subject)
+        json_data = {}
+        if from_date:
+            json_data["from"] = from_date
+        if to_date:
+            json_data["to"] = to_date
+
+        response = self._requester.post(url, json=json_data)
+        self._logger.info("Search successfully")
+        return response
+
+    def get_usage_report_for_repository(self, subject, repo, from_date=None, to_date=None):
+        """ Get monthly download and storage usage report, according to the specified date range
+            for a specific subject repository.
+            Security: Authenticated user with 'admin' permission.
+        :param subject: repository owner
+        :param repo: repository name
+        :param from_date: initial date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+        :param to_date: end date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+        :return: download details
+        """
+        url = "{}/usage/{}/{}".format(Bintray.BINTRAY_URL, subject, repo)
+        json_data = {}
+        if from_date:
+            json_data["from"] = from_date
+        if to_date:
+            json_data["to"] = to_date
+
+        response = self._requester.post(url, json=json_data)
+        self._logger.info("Search successfully")
+        return response
+
+    def get_usage_report_for_package(self, subject, repo, package=None, start_pos=50,
+                                     from_date=None, to_date=None):
+        """ Get current storage usage report. Report can be requested for the specified repository,
+            optionally for a specific package.
+            Security: Authenticated user with 'admin' permission for repo, or 'publish' permission
+                      for specific package.
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param start_pos: index position
+        :param from_date: initial date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+        :param to_date: end date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+        :return: download details
+        """
+        url = "{}/usage/package_usage/{}/{}".format(Bintray.BINTRAY_URL, subject, repo)
+        if package:
+            url += "/{}".format(package)
+        params = {"start_pos": start_pos}
+        json_data = {}
+        if from_date:
+            json_data["from"] = from_date
+        if to_date:
+            json_data["to"] = to_date
+
+        response = self._requester.post(url, json=json_data, params=params)
+        self._logger.info("Search successfully")
+        return response
+
+    def get_usage_report_grouped_by_business_unit(self, subject, business_unit=None,
+                                                  from_date=None,
+                                                  to_date=None):
+        """ Get monthly download and storage usage report, according to the specified date range
+            and grouped by business unit. Report can be requested for a subject or for a specific
+            subject business unit.
+            Security: Authenticated user with 'admin' permission.
+        :param subject: repository owner
+        :param business_unit: business unit name
+        :param from_date: initial date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+        :param to_date: end date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+        :return: download details
+        """
+        url = "{}/usage/business_unit_usage/{}".format(Bintray.BINTRAY_URL, subject)
+        if business_unit:
+            url += "/{}".format(business_unit)
+        json_data = {}
+        if from_date:
+            json_data["from"] = from_date
+        if to_date:
+            json_data["to"] = to_date
+
+        response = self._requester.post(url, json=json_data)
+        self._logger.info("Search successfully")
+        return response
