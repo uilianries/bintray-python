@@ -3312,3 +3312,81 @@ class Bintray(object):
         response = self._requester.get(url)
         self._logger.info("Get successfully")
         return response
+
+    def _create_access_key(self, request_url, id, url=None, cache_for_secs=None, expiry=None,
+                              white_cidrs=None, black_cidrs=None, api_only=False):
+        """ Create a new access key identified by an access key id
+
+             An access key password will be auto-generated if not specified.
+
+        :param request_url: base_url
+        :param id: access key id
+        :param expiry: after that will be automatically revoked. (Unix epoch time in milliseconds)
+        :param url: URL for existence_check (callback)
+        :param cache_for_secs: specified period for caching result. minimum is 60 seconds.
+        :param white_cidrs: will allow access only for those IPs that exist in that address range
+        :param black_cidrs: will block access for all IPs that exist in the specified range.
+        :param api_only: allow access keys access to Bintray UI as well as to the API
+        :return: request response
+        """
+        json_data = {}
+        if id:
+            json_data["id"] = id
+        if expiry:
+            json_data["expiry"] = id
+        if url or cache_for_secs:
+            json_data["existence_check"] = {}
+            if url:
+                json_data["existence_check"]["url"] = url
+            if cache_for_secs:
+                json_data["existence_check"]["cache_for_secs"] = cache_for_secs
+        if white_cidrs:
+            json_data["white_cidrs"] = white_cidrs
+        if black_cidrs:
+            json_data["black_cidrs"] = black_cidrs
+        if api_only is not None:
+            json_data["api_only"] = api_only
+
+        response = self._requester.post(request_url, json=json_data)
+        self._logger.info("Post successfully")
+        return response
+
+    def create_access_key_org(self, org, id, url=None, cache_for_secs=None, expiry=None,
+                              white_cidrs=None, black_cidrs=None, api_only=False):
+        """ Create a new access key identified by an access key id, for an organization.
+
+             An access key password will be auto-generated if not specified.
+
+        :param org: organization name
+        :param id: access key id
+        :param expiry: after that will be automatically revoked. (Unix epoch time in milliseconds)
+        :param url: URL for existence_check (callback)
+        :param cache_for_secs: specified period for caching result. minimum is 60 seconds.
+        :param white_cidrs: will allow access only for those IPs that exist in that address range
+        :param black_cidrs: will block access for all IPs that exist in the specified range.
+        :param api_only: allow access keys access to Bintray UI as well as to the API
+        :return: request response
+        """
+        request_url = "{}/orgs/{}/access_keys".format(Bintray.BINTRAY_URL, org)
+        return self._create_access_key(request_url, id, url, cache_for_secs, expiry, white_cidrs,
+                                       black_cidrs, api_only)
+
+    def create_access_key_user(self, user, id, url=None, cache_for_secs=None, expiry=None,
+                               white_cidrs=None, black_cidrs=None, api_only=False):
+        """ Create a new access key identified by an access key id, for an user.
+
+             An access key password will be auto-generated if not specified.
+
+        :param user: user name
+        :param id: access key id
+        :param expiry: after that will be automatically revoked. (Unix epoch time in milliseconds)
+        :param url: URL for existence_check (callback)
+        :param cache_for_secs: specified period for caching result. minimum is 60 seconds.
+        :param white_cidrs: will allow access only for those IPs that exist in that address range
+        :param black_cidrs: will block access for all IPs that exist in the specified range.
+        :param api_only: allow access keys access to Bintray UI as well as to the API
+        :return: request response
+        """
+        request_url = "{}/users/{}/access_keys".format(Bintray.BINTRAY_URL, user)
+        return self._create_access_key(request_url, id, url, cache_for_secs, expiry, white_cidrs,
+                                       black_cidrs, api_only)
