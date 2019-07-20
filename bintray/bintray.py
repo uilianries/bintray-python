@@ -2862,4 +2862,21 @@ class Bintray(object):
         self._logger.info("Get successfully")
         return response
 
+    def get_package(self, subject, repo, package, attribute_values=True):
+        """ Get general information about a specified package with package name.
+
+            Security: Non-authenticated user.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param attribute_values: show attribute values
+        :return: package details
+        """
+        url = "{}/packages/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, package)
+        params = {"attribute_values": bool_to_number(attribute_values)}
+        response = self._requester.get(url, params=params)
+        self._logger.info("Get successfully")
+        return response
+
 
