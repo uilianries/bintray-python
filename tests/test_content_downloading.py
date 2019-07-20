@@ -50,6 +50,4 @@ def test_url_signing():
         bintray.url_signing("uilianries", "generic", json_file, {})
     except Exception as error:
         error_message = str(error)
-    assert "Could not POST (403): 403 Client Error: Forbidden for url: " \
-           "https://api.bintray.com/signed_url/uilianries/generic/packages.json" \
-           "?encrypt=false" == error_message
+    assert "Could not POST (403): Repository '/uilianries/generic' must be premium" == error_message

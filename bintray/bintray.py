@@ -2223,4 +2223,157 @@ class Bintray(object):
         self._logger.info("Get successfully")
         return response
 
+    # Release Notes
 
+    def get_package_release_notes(self, subject, repo, package):
+        """ Get the release notes for a specific package by subject; Either Bintray
+            release notes or GitHub release notes.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :return: returns the release notes for a specific package by subject
+        """
+        url = "{}/packages/{}/{}/{}/release_notes".format(Bintray.BINTRAY_URL, subject, repo,
+                                                          package)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def create_package_release_notes_github(self, subject, repo, package, github_repo,
+                                            github_release_notes_file):
+        """ Create release notes for a package by subject
+
+            Security: Authenticated user with 'publish' permission, or package read/write
+                      entitlement.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param github_repo: GitHub repository name
+        :param github_release_notes_file: GitHub release notes file path
+        :return: request response
+        """
+        url = "{}/packages/{}/{}/{}/release_notes".format(Bintray.BINTRAY_URL, subject, repo,
+                                                          package)
+        json_data = {"github": {
+                        "github_repo": github_repo,
+                        "github_release_notes_file": github_release_notes_file
+                    }}
+        response = self._requester.post(url, json=json_data)
+        self._logger.info("Post successfully")
+        return response
+
+    def create_package_release_notes_bintray(self, subject, repo, package, syntax, content):
+        """ Create release notes for a package by subject
+
+            Security: Authenticated user with 'publish' permission, or package read/write
+                      entitlement.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param syntax: content syntax
+        :param content: release notes content
+        :return: request response
+        """
+        url = "{}/packages/{}/{}/{}/release_notes".format(Bintray.BINTRAY_URL, subject, repo,
+                                                          package)
+        json_data = {"package": package,
+                     "repo": repo,
+                     "owner": subject,
+                     "bintray": {
+                        "syntax": syntax,
+                        "content": content
+                     }}
+        response = self._requester.post(url, json=json_data)
+        self._logger.info("Post successfully")
+        return response
+
+    def delete_package_release_notes(self, subject, repo, package):
+        """ Deletes release notes for a specific package by subject.
+
+            Security: Authenticated user with 'publish' permission, or package read/write
+                      entitlement.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :return: response request
+        """
+        url = "{}/packages/{}/{}/{}/release_notes".format(Bintray.BINTRAY_URL, subject, repo,
+                                                          package)
+        response = self._requester.delete(url)
+        self._logger.info("Delete successfully")
+        return response
+
+    def get_version_release_notes(self, subject, repo, package, version):
+        """ Get release notes for a specific version by subject
+
+            Security: Authenticated user with 'read' permission for private repositories, or version
+                      read entitlement.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param version: package version
+        :return: release notes
+        """
+        url = "{}/packages/{}/{}/{}/versions/{}/release_notes".format(Bintray.BINTRAY_URL, subject,
+                                                                      repo, package, version)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def create_version_release_notes_github(self, subject, repo, package, version, github_repo,
+                                            github_release_notes_file):
+        """ Create release notes for a specific version by subject. Release notes "content"
+            will be copied from the provided GitHub release notes if using "github".
+
+            Security: Authenticated user with 'publish' permission, or version read/write
+                      entitlement.
+
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param version: package version
+        :param github_repo: GitHub repository name
+        :param github_release_notes_file: GitHub release notes file path
+        :return: request response
+        """
+        url = "{}/packages/{}/{}/{}/versions/{}/release_notes".format(Bintray.BINTRAY_URL, subject,
+                                                                      repo, package, version)
+        json_data = {"github": {
+                        "github_repo": github_repo,
+                        "github_release_notes_file": github_release_notes_file
+                    }}
+        response = self._requester.post(url, json=json_data)
+        self._logger.info("Post successfully")
+        return response
+
+    def create_version_release_notes_bintray(self, subject, repo, package, version, syntax,
+                                             content):
+        """ Create release notes for a package by subject.
+            Release notes "content" has to be passed to the command
+
+            Security: Authenticated user with 'publish' permission, or package read/write
+                      entitlement.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param version: package version
+        :param syntax: content syntax
+        :param content: release notes content
+        :return: request response
+        """
+        url = "{}/packages/{}/{}/{}/versions/{}/release_notes".format(Bintray.BINTRAY_URL, subject,
+                                                                      repo, package, version)
+        json_data = {"bintray": {
+                        "syntax": syntax,
+                        "content": content
+                     }}
+        response = self._requester.post(url, json=json_data)
+        self._logger.info("Post successfully")
+        return response

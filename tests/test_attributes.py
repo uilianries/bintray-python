@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import pytest
 from bintray.bintray import Bintray
 
@@ -8,11 +6,7 @@ from bintray.bintray import Bintray
 def create_attributes():
     bintray = Bintray()
     attributes = [{"name": "att1", "values": ["val1"], "type": "string"}]
-    try:
-        return bintray.set_attributes("uilianries", "generic", "statistics", "test", attributes)
-    except:
-        pass
-    return None
+    return bintray.set_attributes("uilianries", "generic", "statistics", "test", attributes)
 
 
 @pytest.fixture()
@@ -56,7 +50,7 @@ def test_delete_attributes(create_attributes):
 
 def test_search_attributes(create_attributes):
     bintray = Bintray()
-    attributes = [{"att1": ["val1", "val2"]}]
+    attributes = [{'att1': ["val1", "val2"]}]
     response = bintray.search_attributes("uilianries", "generic", "statistics", attributes)
     assert {'error': False, 'statusCode': 200} in response
 
@@ -68,7 +62,7 @@ def test_get_files_attributes(create_file_attributes):
 
 def test_set_files_attributes():
     bintray = Bintray()
-    attributes = [{"name": "att1", "values": ["val2"], "type": "string"}]
+    attributes = [{'name': 'att1', 'values': ['val2'], 'type': "string"}]
     response = bintray.set_file_attributes("uilianries", "generic", "packages.json", attributes)
     assert [{'name': 'att1', 'type': 'STRING', 'values': ['val2']},
             {'error': False, 'statusCode': 200}] == response
@@ -92,14 +86,9 @@ def test_delete_file_attributes(create_file_attributes):
             'statusCode': 200} == response
 
 
-def test_search_file_attributes():
+def test_search_file_attributes(create_file_attributes):
     bintray = Bintray()
-    attributes = [{"name": "att1"}]
-    error_message = ""
-    try:
-        bintray.search_file_attributes("uilianries", "generic", attributes)
-    except Exception as error:
-        error_message = str(error)
+    attributes = [{'att1': ["val1"]}]
+    response = bintray.search_file_attributes("uilianries", "generic", attributes)
+    assert "packages.json" == response[0]["name"]
 
-    assert "Could not POST (400): 400 Client Error: Bad Request for url: " \
-           "https://api.bintray.com/files/uilianries/generic/search/attributes" == error_message

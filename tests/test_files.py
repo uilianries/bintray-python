@@ -1,3 +1,4 @@
+import pytest
 from bintray.bintray import Bintray
 
 
@@ -24,9 +25,7 @@ def test_bad_credentials_for_get_package_files():
         bintray.get_package_files("uilianries", "generic", "statistics")
     except Exception as error:
         error_message = str(error)
-    assert "Could not GET (401): 401 Client Error: Unauthorized for url: " \
-           "https://api.bintray.com/packages/uilianries/generic/statistics/files?" \
-           "include_unpublished=0" == error_message
+    assert "Could not GET (401): This resource requires authentication" == error_message
 
 
 def test_get_version_files():
@@ -52,9 +51,7 @@ def test_bad_credentials_for_get_version_files():
         bintray.get_version_files("uilianries", "generic", "statistics", "20190701")
     except Exception as error:
         error_message = str(error)
-    assert "Could not GET (401): 401 Client Error: Unauthorized for url: " \
-           "https://api.bintray.com/packages/uilianries/generic/statistics/versions" \
-           "/20190701/files?include_unpublished=0" == error_message
+    assert "Could not GET (401): This resource requires authentication" == error_message
 
 
 def test_file_search_by_name():
@@ -80,11 +77,10 @@ def test_bad_credentials_file_search_by_name():
         bintray.search_file_by_name("packages.json", subject="uilianries", repo="generic")
     except Exception as error:
         error_message = str(error)
-    assert "Could not GET (401): 401 Client Error: Unauthorized for url: " \
-           "https://api.bintray.com/search/file" \
-           "?name=packages.json&subject=uilianries&repo=generic" == error_message
+    assert "Could not GET (401): This resource requires authentication" == error_message
 
 
+@pytest.mark.skip(reason="it takes ~2 minutes")
 def test_file_search_by_checksum():
     bintray = Bintray()
     response = bintray.search_file_by_checksum("85abc6aece02515e8bd87b9754a18af697527d88",
@@ -102,10 +98,7 @@ def test_bad_credentials_file_search_by_checksum():
             subject="uilianries", repo="generic")
     except Exception as error:
         error_message = str(error)
-    assert "Could not GET (401): 401 Client Error: Unauthorized for url: " \
-           "https://api.bintray.com/search/file" \
-           "?sha1=85abc6aece02515e8bd87b9754a18af697527d88" \
-           "&subject=uilianries&repo=generic" == error_message
+    assert "Could not GET (401): This resource requires authentication" == error_message
 
 
 def test_file_in_download_list():
