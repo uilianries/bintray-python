@@ -2290,8 +2290,22 @@ class Bintray(object):
         self._logger.info("Post successfully")
         return response
 
-    def delete_package_release_notes(self):
-        pass
+    def delete_package_release_notes(self, subject, repo, package):
+        """ Deletes release notes for a specific package by subject.
+
+            Security: Authenticated user with 'publish' permission, or package read/write
+                      entitlement.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :return: response request
+        """
+        url = "{}/packages/{}/{}/{}/release_notes".format(Bintray.BINTRAY_URL, subject, repo,
+                                                          package)
+        response = self._requester.delete(url)
+        self._logger.info("Set successfully")
+        return response
 
     def get_version_release_notes(self):
         pass

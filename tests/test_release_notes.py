@@ -39,3 +39,9 @@ def test_create_package_release_notes_bintray(create_release_notes):
             'package': 'statistics',
             'repo': 'generic',
             'statusCode': 200} == create_release_notes
+
+
+def test_delete_package_release_notes(create_release_notes):
+    bintray = Bintray()
+    response = bintray.delete_package_release_notes("uilianries", "generic", "statistics")
+    assert {'error': False, 'message': 'success', 'statusCode': 200} == response
