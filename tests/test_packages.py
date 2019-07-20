@@ -73,3 +73,11 @@ def test_search_package():
 
     response = bintray.search_package("qux", "foo", "uilianries", "generic")
     assert {'error': False, 'statusCode': 200} in response
+
+
+def test_get_package_for_file():
+    bintray = Bintray()
+    response = bintray.get_package_for_file("uilianries", "generic", "packages.json")
+
+    assert response["name"] == "statistics"
+    assert response["repo"] == "generic"

@@ -2879,6 +2879,21 @@ class Bintray(object):
         self._logger.info("Get successfully")
         return response
 
+    def get_package_for_file(self, subject, repo, file_path):
+        """ Get general information about the package a repository file is associated with.
+
+            Security: Non-authenticated user.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param file_path: file path to be searched
+        :return: package details
+        """
+        url = "{}/file_package/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, file_path)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
     def create_package(self, subject, repo, package, licenses=None, vcs_url=None,
                        custom_licenses=None, desc=None, labels=None, website_url=None,
                        issue_tracker_url=None, github_repo=None, github_release_notes_file=None,
@@ -3032,3 +3047,5 @@ class Bintray(object):
         response = self._requester.get(url, params=params)
         self._logger.info("Search successfully")
         return response
+
+
