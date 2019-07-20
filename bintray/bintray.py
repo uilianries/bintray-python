@@ -2841,6 +2841,37 @@ class Bintray(object):
 
     # Statistics & Usage Report
 
+    def _get_custom_downloads(self, subject, repo, package, suffix, version=None, from_date=None,
+                              to_date=None):
+        """ Get number of downloads, for the passed time range, per package or per version.
+
+            Security: Authenticated user with 'publish' permission for private repositories,
+                      or package read/write entitlement.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param suffix: suffix name
+        :param version: package version (Optional)
+        :param from_date: initial date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+        :param to_date: end date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+        :return: download details
+        """
+        url = "{}/packages/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, package)
+        if version:
+            url += "/versions/{}/stats/{}".format(version, suffix)
+        else:
+            url += "/stats/{}".format(suffix)
+        json_data = {}
+        if from_date:
+            json_data["from"] = from_date
+        if to_date:
+            json_data["to"] = to_date
+
+        response = self._requester.post(url, json=json_data)
+        self._logger.info("Search successfully")
+        return response
+
     def get_daily_downloads(self, subject, repo, package, version=None, from_date=None,
                             to_date=None):
         """ Get number of downloads per day, for the passed time range, per package or per version.
@@ -2856,20 +2887,8 @@ class Bintray(object):
         :param to_date: end date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
         :return: download details
         """
-        url = "{}/packages/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, package)
-        if version:
-            url += "/versions/{}/stats/time_range_downloads".format(version)
-        else:
-            url += "/stats/time_range_downloads"
-        json_data = {}
-        if from_date:
-            json_data["from"] = from_date
-        if to_date:
-            json_data["to"] = to_date
-
-        response = self._requester.post(url, json=json_data)
-        self._logger.info("Search successfully")
-        return response
+        return self._get_custom_downloads(subject, repo, package, "time_range_downloads", version,
+                                          from_date, to_date)
 
     def get_total_downloads(self, subject, repo, package, version=None, from_date=None,
                             to_date=None):
@@ -2886,17 +2905,23 @@ class Bintray(object):
         :param to_date: end date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
         :return: download details
         """
-        url = "{}/packages/{}/{}/{}".format(Bintray.BINTRAY_URL, subject, repo, package)
-        if version:
-            url += "/versions/{}/stats/total_downloads".format(version)
-        else:
-            url += "/stats/total_downloads"
-        json_data = {}
-        if from_date:
-            json_data["from"] = from_date
-        if to_date:
-            json_data["to"] = to_date
+        return self._get_custom_downloads(subject, repo, package, "total_downloads", version,
+                                          from_date, to_date)
 
-        response = self._requester.post(url, json=json_data)
-        self._logger.info("Search successfully")
-        return response
+    def get_downloads_by_country(self, subject, repo, package, version=None, from_date=None,
+                                 to_date=None):
+        """ Get total number of downloads, for the passed time range, per package or per version.
+
+            Security: Authenticated user with 'publish' permission for private repositories,
+                      or package read/write entitlement.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param version: package version (Optional)
+        :param from_date: initial date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+        :param to_date: end date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+        :return: download details
+        """
+        return self._get_custom_downloads(subject, repo, package, "country_downloads", version,
+                                          from_date, to_date)

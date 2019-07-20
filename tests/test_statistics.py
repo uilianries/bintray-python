@@ -21,3 +21,14 @@ def test_get_total_downloads():
         error_message = str(error)
     assert "Could not POST (403): This resource is only available for premium packages." \
            == error_message
+
+
+def test_get_downloads_by_country():
+    bintray = Bintray()
+    error_message = ""
+    try:
+        bintray.get_downloads_by_country("uilianries", "generic", "statistics")
+    except Exception as error:
+        error_message = str(error)
+    assert "Could not POST (403): This resource is only available for premium packages." \
+           == error_message
