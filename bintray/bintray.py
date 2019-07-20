@@ -2223,4 +2223,34 @@ class Bintray(object):
         self._logger.info("Get successfully")
         return response
 
+    # Release Notes
 
+    def get_package_release_notes(self, subject, repo, package):
+        """ Get the release notes for a specific package by subject; Either Bintray
+            release notes or GitHub release notes.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :return: returns the release notes for a specific package by subject
+        """
+        url = "{}/packages/{}/{}/{}/release_notes".format(Bintray.BINTRAY_URL, subject, repo,
+                                                          package)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def create_package_release_notes(self):
+        pass
+
+    def delete_package_release_notes(self):
+        pass
+
+    def get_version_release_notes(self):
+        pass
+
+    def create_version_release_notes(self):
+        pass
+
+    def get_version_release_notes(self):
+        pass

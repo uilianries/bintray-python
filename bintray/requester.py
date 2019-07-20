@@ -44,7 +44,12 @@ class Requester(object):
         try:
             response.raise_for_status()
         except Exception as error:
-            raise Exception("{} ({}): {}".format(message, response.status_code, str(error)))
+            error_message = str(error)
+            try:
+                error_message = response.json()["message"]
+            except:
+                pass
+            raise Exception("{} ({}): {}".format(message, response.status_code, error_message))
 
     def get(self, url, params=None):
         """ Forward GET method
