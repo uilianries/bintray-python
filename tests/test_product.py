@@ -25,3 +25,16 @@ def test_create_product():
         error_message = str(error)
     assert "Could not POST (400): Package generic/statistics should be under premium repository " \
            "for owning product." == error_message
+
+
+def test_update_product():
+    bintray = Bintray()
+    error_message = ""
+    try:
+        bintray.update_product("jfrog", "xray", "test_display", "another test product",
+                               "http://www.example.com",
+                               "http://github.com/uilianries/bintray-python",
+                               ["generic/statistics"])
+    except Exception as error:
+        error_message = str(error)
+    assert "Could not PATCH (403): forbidden" == error_message

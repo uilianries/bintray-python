@@ -2499,3 +2499,38 @@ class Bintray(object):
         response = self._requester.post(url, json=json_data)
         self._logger.info("Post successfully")
         return response
+
+    def update_product(self, subject, product, display_name=None, desc=None, website=None, vcs=None,
+                       packages=None):
+        """ Update an existing product.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param product: product name
+        :param display_name: product name to be displayed
+        :param desc: product description
+        :param website: product website url
+        :param vcs: product VCS url
+        :param packages: list of packages associated to the product
+        :return: request response
+        """
+        url = "{}/products/{}/{}".format(Bintray.BINTRAY_URL, subject, product)
+        json_data = {}
+        if display_name:
+            json_data["display_name"] = display_name
+        if desc:
+            json_data["desc"] = desc
+        if website:
+            json_data["website_url"] = website
+        if vcs:
+            json_data["vcs_url"] = vcs
+        if packages:
+            json_data["packages"] = packages
+
+        if not json_data:
+            raise ValueError("At lease one parameter must be filled.")
+
+        response = self._requester.patch(url, json=json_data)
+        self._logger.info("Patch successfully")
+        return response
