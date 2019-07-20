@@ -2796,3 +2796,45 @@ class Bintray(object):
 
         self._logger.info("Patch successfully")
         return response
+
+    def delete_usage_threshold_org(self, org):
+        """ Delete organization usage threshold
+
+            Security: Authenticated user with organization ‘admin’ permission.
+
+        :param org: organization name
+        :return: request response
+        """
+        url = "{}/usage_threshold/organization/{}".format(Bintray.BINTRAY_URL, org)
+        response = self._requester.delete(url)
+        self._logger.info("Delete successfully")
+        return response
+
+    def delete_usage_threshold_repository(self, org, repo):
+        """ Delete repository usage threshold
+
+            Security: Authenticated user with organization ‘admin’ permission.
+
+        :param org: organization name
+        :param repo: repository name
+        :return: request response
+        """
+        url = "{}/usage_threshold/repo/{}/{}".format(Bintray.BINTRAY_URL, org, repo)
+        response = self._requester.delete(url)
+        self._logger.info("Delete successfully")
+        return response
+
+    def delete_usage_threshold_business_unit(self, org, business_unit):
+        """ Delete usage threshold for business unit
+
+            Security: Authenticated user with organization ‘admin’ permission.
+
+        :param org: organization name
+        :param business_unit: business unit name
+        :return: request response
+        """
+        url = "{}/usage_threshold/business_unit/{}/{}".format(Bintray.BINTRAY_URL, org,
+                                                              business_unit)
+        response = self._requester.delete(url)
+        self._logger.info("Delete successfully")
+        return response

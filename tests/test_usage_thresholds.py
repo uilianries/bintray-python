@@ -95,3 +95,33 @@ def test_update_usage_threshold_business_unit():
     except Exception as error:
         error_message = str(error)
     assert "Could not PATCH (404): BusinessUnit 'xray' was not found" == error_message
+
+
+def test_delete_usage_threshold_org():
+    bintray = Bintray()
+    error_message = ""
+    try:
+        bintray.delete_usage_threshold_org("jfrog")
+    except Exception as error:
+        error_message = str(error)
+    assert "Could not DELETE (403): forbidden" == error_message
+
+
+def test_delete_usage_threshold_repository():
+    bintray = Bintray()
+    error_message = ""
+    try:
+        bintray.delete_usage_threshold_repository("jfrog", "xray")
+    except Exception as error:
+        error_message = str(error)
+    assert "Could not DELETE (403): forbidden" == error_message
+
+
+def test_delete_usage_threshold_business_unit():
+    bintray = Bintray()
+    error_message = ""
+    try:
+        bintray.delete_usage_threshold_business_unit("jfrog", "xray")
+    except Exception as error:
+        error_message = str(error)
+    assert "Could not DELETE (404): BusinessUnit 'xray' was not found" == error_message
