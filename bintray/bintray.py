@@ -3256,3 +3256,31 @@ class Bintray(object):
         response = self._requester.post(url, json=json_data)
         self._logger.info("Search successfully")
         return response
+
+    # Entitlements (This resource is only available to Bintray Pro and Enterprise users)
+
+    def get_access_keys_org(self, org):
+        """ Get a list of access keys associated with an organization
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param org: organization name
+        :return: list of keys
+        """
+        url = "{}/orgs/{}/access_keys".format(Bintray.BINTRAY_URL, org)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def get_access_keys_user(self, user):
+        """ Get a list of access keys associated with an user
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param org: organization name
+        :return: list of keys
+        """
+        url = "{}/users/{}/access_keys".format(Bintray.BINTRAY_URL, user)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
