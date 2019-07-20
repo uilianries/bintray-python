@@ -3390,3 +3390,31 @@ class Bintray(object):
         request_url = "{}/users/{}/access_keys".format(Bintray.BINTRAY_URL, user)
         return self._create_access_key(request_url, id, url, cache_for_secs, expiry, white_cidrs,
                                        black_cidrs, api_only)
+
+    def delete_access_key_org(self, org, access_key_id):
+        """ Delete an access key associated with an organization.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param org: organization name
+        :param access_key_id: access key id
+        :return: request response
+        """
+        url = "{}/orgs/{}/access_keys/{}".format(Bintray.BINTRAY_URL, org, access_key_id)
+        response = self._requester.delete(url)
+        self._logger.info("Delete successfully")
+        return response
+
+    def delete_access_key_user(self, user, access_key_id):
+        """ Delete an access key associated with an user.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param user: user name
+        :param access_key_id: access key id
+        :return: request response
+        """
+        url = "{}/users/{}/access_keys/{}".format(Bintray.BINTRAY_URL, user, access_key_id)
+        response = self._requester.delete(url)
+        self._logger.info("Delete successfully")
+        return response
