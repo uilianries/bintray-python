@@ -2534,3 +2534,17 @@ class Bintray(object):
         response = self._requester.patch(url, json=json_data)
         self._logger.info("Patch successfully")
         return response
+
+    def delete_product(self, subject, product):
+        """ Delete the specified product and all its sub-elements (such as EULAs).
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param product: product name
+        :return: request response
+        """
+        url = "{}/products/{}/{}".format(Bintray.BINTRAY_URL, subject, product)
+        response = self._requester.delete(url)
+        self._logger.info("Delete successfully")
+        return response

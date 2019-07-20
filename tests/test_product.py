@@ -38,3 +38,13 @@ def test_update_product():
     except Exception as error:
         error_message = str(error)
     assert "Could not PATCH (403): forbidden" == error_message
+
+
+def test_delete_product():
+    bintray = Bintray()
+    error_message = ""
+    try:
+        bintray.delete_product("jfrog", "xray")
+    except Exception as error:
+        error_message = str(error)
+    assert "Could not DELETE (403): forbidden" == error_message
