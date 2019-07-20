@@ -65,3 +65,14 @@ def test_get_usage_report_for_package():
         error_message = str(error)
     assert "Could not POST (403): This resource is only available for Premium repositories" \
            == error_message
+
+
+def test_get_usage_report_grouped_by_business_unit():
+    bintray = Bintray()
+    error_message = ""
+    try:
+        bintray.get_usage_report_grouped_by_business_unit("uilianries", "generic")
+    except Exception as error:
+        error_message = str(error)
+    assert "Could not POST (403): This resource is only available for Enterprise users" \
+           == error_message

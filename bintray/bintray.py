@@ -3000,3 +3000,30 @@ class Bintray(object):
         response = self._requester.post(url, json=json_data, params=params)
         self._logger.info("Search successfully")
         return response
+
+    def get_usage_report_grouped_by_business_unit(self, subject, business_unit=None, from_date=None,
+                                                  to_date=None):
+        """ Get monthly download and storage usage report, according to the specified date range
+            and grouped by business unit. Report can be requested for a subject or for a specific
+            subject business unit.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param business_unit: business unit name
+        :param from_date: initial date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+        :param to_date: end date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+        :return: download details
+        """
+        url = "{}/usage/business_unit_usage/{}".format(Bintray.BINTRAY_URL, subject)
+        if business_unit:
+            url += "/{}".format(business_unit)
+        json_data = {}
+        if from_date:
+            json_data["from"] = from_date
+        if to_date:
+            json_data["to"] = to_date
+
+        response = self._requester.post(url, json=json_data)
+        self._logger.info("Search successfully")
+        return response
