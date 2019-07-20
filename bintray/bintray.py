@@ -2462,3 +2462,40 @@ class Bintray(object):
         response = self._requester.get(url)
         self._logger.info("Get successfully")
         return response
+
+    def create_product(self, subject, name, display_name, desc, website, vcs, packages,
+                       sign_url_expiry=10):
+        """ Create a product for the given subject.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param name: product name
+        :param display_name: product name to be displayed
+        :param desc: product description
+        :param website: product website url
+        :param vcs: product VCS url
+        :param packages: list of packages associated to the product
+        :param sign_url_expiry: expiration time
+        :return: request response
+        """
+        url = "{}/products/{}".format(Bintray.BINTRAY_URL, subject)
+        json_data = {}
+        if name:
+            json_data["name"] = name
+        if display_name:
+            json_data["display_name"] = display_name
+        if desc:
+            json_data["desc"] = desc
+        if website:
+            json_data["website_url"] = website
+        if vcs:
+            json_data["vcs_url"] = vcs
+        if packages:
+            json_data["packages"] = packages
+        if sign_url_expiry:
+            json_data["sign_url_expiry"] = sign_url_expiry
+
+        response = self._requester.post(url, json=json_data)
+        self._logger.info("Post successfully")
+        return response
