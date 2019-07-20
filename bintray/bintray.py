@@ -2431,3 +2431,120 @@ class Bintray(object):
         response = self._requester.get(url)
         self._logger.info("Get successfully")
         return response
+
+    # Product (This resource is only available to Bintray Enterprise Edition users.)
+
+    def get_products(self, subject):
+        """ Get a list of products for the specified subject.
+
+            Security: Authenticated user with 'read' permission for private repositories, or
+                      repository read entitlement.
+
+        :param subject: repository owner
+        :return: a list of products associated to the subject
+        """
+        url = "{}/products/{}".format(Bintray.BINTRAY_URL, subject)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def get_product(self, subject, product):
+        """ Get details for the specified product.
+
+            Security: Authenticated user with 'read' permission for private repositories, or
+                      repository read entitlement.
+
+        :param subject: repository owner
+        :param product: product name
+        :return: details of a product
+        """
+        url = "{}/products/{}/{}".format(Bintray.BINTRAY_URL, subject, product)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def create_product(self, subject, name, display_name, desc, website, vcs, packages,
+                       sign_url_expiry=10):
+        """ Create a product for the given subject.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param name: product name
+        :param display_name: product name to be displayed
+        :param desc: product description
+        :param website: product website url
+        :param vcs: product VCS url
+        :param packages: list of packages associated to the product
+        :param sign_url_expiry: expiration time
+        :return: request response
+        """
+        url = "{}/products/{}".format(Bintray.BINTRAY_URL, subject)
+        json_data = {}
+        if name:
+            json_data["name"] = name
+        if display_name:
+            json_data["display_name"] = display_name
+        if desc:
+            json_data["desc"] = desc
+        if website:
+            json_data["website_url"] = website
+        if vcs:
+            json_data["vcs_url"] = vcs
+        if packages:
+            json_data["packages"] = packages
+        if sign_url_expiry:
+            json_data["sign_url_expiry"] = sign_url_expiry
+
+        response = self._requester.post(url, json=json_data)
+        self._logger.info("Post successfully")
+        return response
+
+    def update_product(self, subject, product, display_name=None, desc=None, website=None, vcs=None,
+                       packages=None):
+        """ Update an existing product.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param product: product name
+        :param display_name: product name to be displayed
+        :param desc: product description
+        :param website: product website url
+        :param vcs: product VCS url
+        :param packages: list of packages associated to the product
+        :return: request response
+        """
+        url = "{}/products/{}/{}".format(Bintray.BINTRAY_URL, subject, product)
+        json_data = {}
+        if display_name:
+            json_data["display_name"] = display_name
+        if desc:
+            json_data["desc"] = desc
+        if website:
+            json_data["website_url"] = website
+        if vcs:
+            json_data["vcs_url"] = vcs
+        if packages:
+            json_data["packages"] = packages
+
+        if not json_data:
+            raise ValueError("At lease one parameter must be filled.")
+
+        response = self._requester.patch(url, json=json_data)
+        self._logger.info("Patch successfully")
+        return response
+
+    def delete_product(self, subject, product):
+        """ Delete the specified product and all its sub-elements (such as EULAs).
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param product: product name
+        :return: request response
+        """
+        url = "{}/products/{}/{}".format(Bintray.BINTRAY_URL, subject, product)
+        response = self._requester.delete(url)
+        self._logger.info("Delete successfully")
+        return response
