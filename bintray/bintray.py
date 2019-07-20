@@ -2839,7 +2839,7 @@ class Bintray(object):
         self._logger.info("Delete successfully")
         return response
 
-    # Statistics & Usage Report
+    # Statistics & Usage Report (This resource is only available for Bintray Premium accounts.)
 
     def _get_custom_downloads(self, subject, repo, package, suffix, version=None, from_date=None,
                               to_date=None):
@@ -2938,6 +2938,29 @@ class Bintray(object):
         :return: download details
         """
         url = "{}/usage/{}".format(Bintray.BINTRAY_URL, subject)
+        json_data = {}
+        if from_date:
+            json_data["from"] = from_date
+        if to_date:
+            json_data["to"] = to_date
+
+        response = self._requester.post(url, json=json_data)
+        self._logger.info("Search successfully")
+        return response
+
+    def get_usage_report_for_repository(self, subject, repo, from_date=None, to_date=None):
+        """ Get monthly download and storage usage report, according to the specified date range
+            for a specific subject repository.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param from_date: initial date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+        :param to_date: end date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+        :return: download details
+        """
+        url = "{}/usage/{}/{}".format(Bintray.BINTRAY_URL, subject, repo)
         json_data = {}
         if from_date:
             json_data["from"] = from_date
