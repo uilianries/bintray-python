@@ -2240,8 +2240,55 @@ class Bintray(object):
         self._logger.info("Get successfully")
         return response
 
-    def create_package_release_notes(self):
-        pass
+    def create_package_release_notes_github(self, subject, repo, package, github_repo,
+                                            github_release_notes_file):
+        """ Create release notes for a package by subject
+
+            Security: Authenticated user with 'publish' permission, or package read/write
+                      entitlement.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param github_repo: GitHub repository name
+        :param github_release_notes_file: GitHub release notes file path
+        :return: request response
+        """
+        url = "{}/packages/{}/{}/{}/release_notes".format(Bintray.BINTRAY_URL, subject, repo,
+                                                          package)
+        json_data = {"github": {
+                        "github_repo": github_repo,
+                        "github_release_notes_file": github_release_notes_file
+                    }}
+        response = self._requester.post(url, json=json_data)
+        self._logger.info("Post successfully")
+        return response
+
+    def create_package_release_notes_bintray(self, subject, repo, package, syntax, content):
+        """ Create release notes for a package by subject
+
+            Security: Authenticated user with 'publish' permission, or package read/write
+                      entitlement.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param syntax: content syntax
+        :param content: release notes content
+        :return: request response
+        """
+        url = "{}/packages/{}/{}/{}/release_notes".format(Bintray.BINTRAY_URL, subject, repo,
+                                                          package)
+        json_data = {"package": package,
+                     "repo": repo,
+                     "owner": subject,
+                     "bintray": {
+                        "syntax": syntax,
+                        "content": content
+                     }}
+        response = self._requester.post(url, json=json_data)
+        self._logger.info("Post successfully")
+        return response
 
     def delete_package_release_notes(self):
         pass

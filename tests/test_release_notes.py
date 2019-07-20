@@ -1,14 +1,41 @@
+import pytest
 from bintray.bintray import Bintray
 
 
-def test_get_package_release_notes():
+@pytest.fixture()
+def create_release_notes():
+    bintray = Bintray()
+    return bintray.create_package_release_notes_bintray("uilianries", "generic", "statistics",
+                                                        "markdown", "test")
+
+
+def test_get_package_release_notes(create_release_notes):
+    bintray = Bintray()
+    response = bintray.get_package_release_notes("uilianries", "generic", "statistics")
+    assert {'bintray': {'content': 'test', 'syntax': 'MARKDOWN'},
+            'error': False,
+            'owner': 'uilianries',
+            'package': 'statistics',
+            'repo': 'generic',
+            'statusCode': 200} == response
+
+
+def test_create_package_release_notes_github():
     bintray = Bintray()
     error_message = ""
     try:
-        bintray.get_package_release_notes("uilianries", "generic", "statistics")
+        bintray.create_package_release_notes_github("uilianries", "generic", "statistics",
+                                                    "uilanries/bintray-python", "0.7.0/README.md")
     except Exception as error:
         error_message = str(error)
-    assert "Could not GET (400): No release notes found for subject 'uilianries' repo 'generic' " \
-           "and pkg 'statistics' in the package level. Please check the version level release " \
-           "notes" == error_message
+    assert "Could not POST (400): Failed to set release notes files for subject 'uilianries' repo "\
+           "'generic' and pkg 'statistics', Please check your github details" == error_message
 
+
+def test_create_package_release_notes_bintray(create_release_notes):
+    assert {'bintray': {'content': 'test', 'syntax': 'MARKDOWN'},
+            'error': False,
+            'owner': 'uilianries',
+            'package': 'statistics',
+            'repo': 'generic',
+            'statusCode': 200} == create_release_notes
