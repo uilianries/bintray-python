@@ -3277,10 +3277,38 @@ class Bintray(object):
 
             Security: Authenticated user with 'admin' permission.
 
-        :param org: organization name
+        :param user: user name
         :return: list of keys
         """
         url = "{}/users/{}/access_keys".format(Bintray.BINTRAY_URL, user)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def get_access_key_org(self, org, access_key_id):
+        """ Get an access key associated with an organization, by its id.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param org: organization name
+        :param access_key_id: access key id
+        :return: list of keys
+        """
+        url = "{}/orgs/{}/access_keys/{}".format(Bintray.BINTRAY_URL, org, access_key_id)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def get_access_key_user(self, user, access_key_id):
+        """ Get an access key associated with an user, by its id.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param user: user name
+        :param access_key_id: access key id
+        :return: list of keys
+        """
+        url = "{}/users/{}/access_keys/{}".format(Bintray.BINTRAY_URL, user, access_key_id)
         response = self._requester.get(url)
         self._logger.info("Get successfully")
         return response
