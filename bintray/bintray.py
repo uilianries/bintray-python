@@ -2970,3 +2970,33 @@ class Bintray(object):
         response = self._requester.post(url, json=json_data)
         self._logger.info("Search successfully")
         return response
+
+    def get_usage_report_for_package(self, subject, repo, package=None, start_pos=50,
+                                     from_date=None, to_date=None):
+        """ Get current storage usage report. Report can be requested for the specified repository,
+            optionally for a specific package.
+
+            Security: Authenticated user with 'admin' permission for repo, or 'publish' permission
+                      for specific package.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param start_pos: index position
+        :param from_date: initial date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+        :param to_date: end date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
+        :return: download details
+        """
+        url = "{}/usage/package_usage/{}/{}".format(Bintray.BINTRAY_URL, subject, repo)
+        if package:
+            url += "/{}".format(package)
+        params = {"start_pos": start_pos}
+        json_data = {}
+        if from_date:
+            json_data["from"] = from_date
+        if to_date:
+            json_data["to"] = to_date
+
+        response = self._requester.post(url, json=json_data, params=params)
+        self._logger.info("Search successfully")
+        return response
