@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 def bool_to_number(value):
     """ Convert boolean result into numeric string
 

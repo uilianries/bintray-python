@@ -8,8 +8,11 @@ from bintray.bintray import Bintray
 def create_attributes():
     bintray = Bintray()
     attributes = [{"name": "att1", "values": ["val1"], "type": "string"}]
-    response = bintray.set_attributes("uilianries", "generic", "statistics", "test", attributes)
-    return response
+    try:
+        return bintray.set_attributes("uilianries", "generic", "statistics", "test", attributes)
+    except:
+        pass
+    return None
 
 
 @pytest.fixture()
@@ -79,7 +82,7 @@ def test_update_files_attributes():
             {'error': False, 'statusCode': 200}] == response
 
 
-def test_delete_file_attributes(create_attributes):
+def test_delete_file_attributes(create_file_attributes):
     bintray = Bintray()
     attributes = ["att1"]
     response = bintray.delete_file_attributes("uilianries", "generic", "packages.json", attributes)

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ Python Wrapper for Bintray API
 
     https://bintray.com/docs/api
@@ -1904,7 +1903,7 @@ class Bintray(object):
 
         response = self._requester.delete(url)
         self._logger.info("Delete successfully")
-    
+
     # Subjects (This resource is only available to Bintray Premium users.)
 
     def regenerate_subject_url_signing_key(self, subject):
@@ -2169,3 +2168,59 @@ class Bintray(object):
         response = self._requester.post(url, json=attributes)
         self._logger.info("Search successfully")
         return response
+
+    # EULA Tracking
+
+    def get_product_signed_eulas(self, subject, product, from_date=None, to_date=None,
+                                 username=None, eula_name=None):
+        """ Get a list of users who signed eula per product with sign date, version signed and eula.
+
+        :param subject: repository owner
+        :param product: product name
+        :param from_date: date to filter by, ISO8601 format (yyyy-MM-dd’T’HH:mm:ss.SSSZ)
+        :param to_date: date to filter by, ISO8601 format (yyyy-MM-dd’T’HH:mm:ss.SSSZ)
+        :param username: filter by username
+        :param eula_name: filter by Eula name
+        :return: A list of EULAs
+        """
+        url = "{}/products/{}/{}/signed_eulas".format(Bintray.BINTRAY_URL, subject, product)
+        params = {}
+        if from_date:
+            params["from"] = from_date
+        if to_date:
+            params["to"] = to_date
+        if username:
+            params["username"] = username
+        if eula_name:
+            params["eula_name"] = eula_name
+        response = self._requester.get(url, params=params)
+        self._logger.info("Get successfully")
+        return response
+
+    def get_all_products_signed_eulas(self, subject, from_date=None, to_date=None, username=None,
+                                      eula_name=None):
+        """ Get a list of users who signed eula with sign date, version signed and eula name for
+            each product owned by the given subject.
+
+        :param subject: repository owner
+        :param from_date: date to filter by, ISO8601 format (yyyy-MM-dd’T’HH:mm:ss.SSSZ)
+        :param to_date: date to filter by, ISO8601 format (yyyy-MM-dd’T’HH:mm:ss.SSSZ)
+        :param username: filter by username
+        :param eula_name: filter by Eula name
+        :return: a list of EULAs
+        """
+        url = "{}/products/{}/_all/signed_eulas".format(Bintray.BINTRAY_URL, subject)
+        params = {}
+        if from_date:
+            params["from"] = from_date
+        if to_date:
+            params["to"] = to_date
+        if username:
+            params["username"] = username
+        if eula_name:
+            params["eula_name"] = eula_name
+        response = self._requester.get(url, params=params)
+        self._logger.info("Get successfully")
+        return response
+
+
