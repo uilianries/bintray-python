@@ -3314,7 +3314,7 @@ class Bintray(object):
         return response
 
     def _create_access_key(self, request_url, id, url=None, cache_for_secs=None, expiry=None,
-                              white_cidrs=None, black_cidrs=None, api_only=False):
+                           white_cidrs=None, black_cidrs=None, api_only=False):
         """ Create a new access key identified by an access key id
 
              An access key password will be auto-generated if not specified.
@@ -3333,7 +3333,7 @@ class Bintray(object):
         if id:
             json_data["id"] = id
         if expiry:
-            json_data["expiry"] = id
+            json_data["expiry"] = expiry
         if url or cache_for_secs:
             json_data["existence_check"] = {}
             if url:
@@ -3418,3 +3418,73 @@ class Bintray(object):
         response = self._requester.delete(url)
         self._logger.info("Delete successfully")
         return response
+
+    def _update_access_key(self, request_url, url=None, cache_for_secs=None, expiry=None,
+                           white_cidrs=None, black_cidrs=None):
+        """ Update an existing access key identified by an access key id
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param request_url: base_url
+        :param expiry: after that will be automatically revoked. (Unix epoch time in milliseconds)
+        :param url: URL for existence_check (callback)
+        :param cache_for_secs: specified period for caching result. minimum is 60 seconds.
+        :param white_cidrs: will allow access only for those IPs that exist in that address range
+        :param black_cidrs: will block access for all IPs that exist in the specified range.
+        :return: request response
+        """
+        json_data = {}
+        if expiry:
+            json_data["expiry"] = expiry
+        if url or cache_for_secs:
+            json_data["existence_check"] = {}
+            if url:
+                json_data["existence_check"]["url"] = url
+            if cache_for_secs:
+                json_data["existence_check"]["cache_for_secs"] = cache_for_secs
+        if white_cidrs:
+            json_data["white_cidrs"] = white_cidrs
+        if black_cidrs:
+            json_data["black_cidrs"] = black_cidrs
+
+        response = self._requester.patch(request_url, json=json_data)
+        self._logger.info("Post successfully")
+        return response
+
+    def update_access_key_org(self, org, access_key_id, url=None, cache_for_secs=None, expiry=None,
+                           white_cidrs=None, black_cidrs=None):
+        """ Update an existing access key identified by an access key id, for an organization.
+
+             Security: Authenticated user with 'admin' permission.
+
+        :param org: organization name
+        :param access_key_id: access key to be updated
+        :param expiry: after that will be automatically revoked. (Unix epoch time in milliseconds)
+        :param url: URL for existence_check (callback)
+        :param cache_for_secs: specified period for caching result. minimum is 60 seconds.
+        :param white_cidrs: will allow access only for those IPs that exist in that address range
+        :param black_cidrs: will block access for all IPs that exist in the specified range.
+        :return: request response
+        """
+        request_url = "{}/orgs/{}/access_keys/{}".format(Bintray.BINTRAY_URL, org, access_key_id)
+        return self._update_access_key(request_url, url, cache_for_secs, expiry, white_cidrs,
+                                       black_cidrs)
+
+    def update_access_key_user(self, user, access_key_id, url=None, cache_for_secs=None,
+                               expiry=None, white_cidrs=None, black_cidrs=None):
+        """ Update an existing access key identified by an access key id, for an user.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param user: user name
+        :param access_key_id: access key to be updated
+        :param expiry: after that will be automatically revoked. (Unix epoch time in milliseconds)
+        :param url: URL for existence_check (callback)
+        :param cache_for_secs: specified period for caching result. minimum is 60 seconds.
+        :param white_cidrs: will allow access only for those IPs that exist in that address range
+        :param black_cidrs: will block access for all IPs that exist in the specified range.
+        :return: request response
+        """
+        request_url = "{}/users/{}/access_keys/{}".format(Bintray.BINTRAY_URL, user, access_key_id)
+        return self._update_access_key(request_url, url, cache_for_secs, expiry, white_cidrs,
+                                       black_cidrs)
