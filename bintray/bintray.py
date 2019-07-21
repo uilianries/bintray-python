@@ -40,6 +40,7 @@ class Bintray(object):
 
             When called by a user with publishing rights on the package,
             includes unpublished files in the list. By default only published files are shown.
+
         :param subject: username or organization
         :param repo: repository name
         :param package: package name
@@ -3116,8 +3117,10 @@ class Bintray(object):
     def get_daily_downloads(self, subject, repo, package, version=None, from_date=None,
                             to_date=None):
         """ Get number of downloads per day, for the passed time range, per package or per version.
+
             Security: Authenticated user with 'publish' permission for private repositories,
                       or package read/write entitlement.
+
         :param subject: repository owner
         :param repo: repository name
         :param package: package name
@@ -3133,8 +3136,10 @@ class Bintray(object):
     def get_total_downloads(self, subject, repo, package, version=None, from_date=None,
                             to_date=None):
         """ Get total number of downloads, for the passed time range, per package or per version.
+
             Security: Authenticated user with 'publish' permission for private repositories,
                       or package read/write entitlement.
+
         :param subject: repository owner
         :param repo: repository name
         :param package: package name
@@ -3149,8 +3154,10 @@ class Bintray(object):
     def get_downloads_by_country(self, subject, repo, package, version=None, from_date=None,
                                  to_date=None):
         """ Get total number of downloads, for the passed time range, per package or per version.
+
             Security: Authenticated user with 'publish' permission for private repositories,
                       or package read/write entitlement.
+
         :param subject: repository owner
         :param repo: repository name
         :param package: package name
@@ -3165,7 +3172,9 @@ class Bintray(object):
     def get_usage_report_for_subject(self, subject, from_date=None, to_date=None):
         """ Get monthly download and storage usage report, according to the specified date range
             for a subject.
+
             Security: Authenticated user with 'admin' permission.
+
         :param subject: repository owner
         :param from_date: initial date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
         :param to_date: end date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
@@ -3185,7 +3194,9 @@ class Bintray(object):
     def get_usage_report_for_repository(self, subject, repo, from_date=None, to_date=None):
         """ Get monthly download and storage usage report, according to the specified date range
             for a specific subject repository.
+
             Security: Authenticated user with 'admin' permission.
+
         :param subject: repository owner
         :param repo: repository name
         :param from_date: initial date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)
@@ -3207,8 +3218,10 @@ class Bintray(object):
                                      from_date=None, to_date=None):
         """ Get current storage usage report. Report can be requested for the specified repository,
             optionally for a specific package.
+
             Security: Authenticated user with 'admin' permission for repo, or 'publish' permission
                       for specific package.
+
         :param subject: repository owner
         :param repo: repository name
         :param package: package name
@@ -3237,7 +3250,9 @@ class Bintray(object):
         """ Get monthly download and storage usage report, according to the specified date range
             and grouped by business unit. Report can be requested for a subject or for a specific
             subject business unit.
+
             Security: Authenticated user with 'admin' permission.
+
         :param subject: repository owner
         :param business_unit: business unit name
         :param from_date: initial date range ISO8601 (yyyy-MM-dd'T'HH:mm:ss.SSSZ)

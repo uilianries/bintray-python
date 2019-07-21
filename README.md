@@ -13,9 +13,27 @@
 
 **The Python wrapper for Bintray API**
 
+#### Installation
+
+    pip install bintray-python
+
+#### Usage
+
+To search repositories from a subject:
+
+```python
+from bintray.bintray import Bintray
+
+bintray = Bintray()
+response = bintray.search_repository("conan-center")
+print(response)
+```
+
 #### Documentation
 
 Please, read the official documentation from Bintray: https://bintray.com/docs/api
+
+Alternatively, you can check the project reference on https://bintray-python.readthedocs.io
 
 #### License
 [MIT](LICENSE)
