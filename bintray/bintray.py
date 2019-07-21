@@ -3640,3 +3640,59 @@ class Bintray(object):
         response = self._requester.delete(url)
         self._logger.info("Delete successfully")
         return response
+
+    def update_entitlement(self, subject, entitlement_id, repo=None, package=None, version=None,
+                           access=None, access_keys=None, tags=None, product=None):
+        """ Update the information of the specified entitlement of a specified scope. Scope can be a
+            product, a repository with an optional path, a package or a version.
+
+            When specifying an optional path value for repository scope, path needs to be relative
+            and refer to a directory or a file in the repository.
+
+            Access mode can be either rw (read-write: implies download, upload and delete) or r
+            (read: implies download).
+
+            When specifying a scope with product, access mode can only be r (read: implies
+            download). Tags can be added for search purposes.
+
+            An entitlement id will be auto-generated if not specified.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param entitlement_id: entitlement id to be updated
+        :param repo: repository name
+        :param package: package name
+        :param version: package version
+        :param product: product name (only for Enterprise Account)
+        :param access: entitlement access more (r/w)
+        :param access_keys: list of access keys
+        :param tags: associated tags
+        :return: entitlements list
+        """
+        if product:
+            url = "{}/products/{}/{}/entitlements/{}".format(Bintray.BINTRAY_URL, subject, product,
+                                                             entitlement_id)
+        else:
+            if version:
+                url = "{}/packages/{}/{}/{}/versions/{}/entitlements/{}".format(Bintray.BINTRAY_URL,
+                                                                                subject, repo,
+                                                                                package, version,
+                                                                                entitlement_id)
+            elif package:
+                url = "{}/packages/{}/{}/{}/entitlements/{}".format(Bintray.BINTRAY_URL, subject,
+                                                                    repo, package, entitlement_id)
+            else:
+                url = "{}/packages/{}/{}/entitlements/{}".format(Bintray.BINTRAY_URL, subject, repo,
+                                                                 entitlement_id)
+        json_data = {}
+        if access:
+            json_data["access"] = access
+        if access_keys:
+            json_data["access_keys"] = access
+        if tags:
+            json_data["tags"] = tags
+
+        response = self._requester.patch(url, json=json_data)
+        self._logger.info("Update successfully")
+        return response

@@ -20,11 +20,11 @@ def test_get_entitlements():
     assert "Could not GET (403): forbidden" == error_message
 
 
-def test_get_entitlement():
+def test_create_entitlement():
     bintray = Bintray()
     error_message = ""
     try:
-        bintray.get_entitlement("uilianries", "foobar", "generic", "statistics", "test")
+        bintray.create_entitlement("uilianries", "foobar", "generic", "statistics", "test")
     except Exception as error:
         error_message = str(error)
 
@@ -32,7 +32,7 @@ def test_get_entitlement():
            "management." == error_message
 
     try:
-        bintray.get_entitlement("jfrog", "foobar", product="xray")
+        bintray.create_entitlement("jfrog", "foobar", product="xray")
     except Exception as error:
         error_message = str(error)
 
