@@ -3256,3 +3256,506 @@ class Bintray(object):
         response = self._requester.post(url, json=json_data)
         self._logger.info("Search successfully")
         return response
+
+    # Entitlements (This resource is only available to Bintray Pro and Enterprise users)
+
+    def get_access_keys_org(self, org):
+        """ Get a list of access keys associated with an organization
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param org: organization name
+        :return: list of keys
+        """
+        url = "{}/orgs/{}/access_keys".format(Bintray.BINTRAY_URL, org)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def get_access_keys_user(self, user):
+        """ Get a list of access keys associated with an user
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param user: user name
+        :return: list of keys
+        """
+        url = "{}/users/{}/access_keys".format(Bintray.BINTRAY_URL, user)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def get_access_key_org(self, org, access_key_id):
+        """ Get an access key associated with an organization, by its id.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param org: organization name
+        :param access_key_id: access key id
+        :return: list of keys
+        """
+        url = "{}/orgs/{}/access_keys/{}".format(Bintray.BINTRAY_URL, org, access_key_id)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def get_access_key_user(self, user, access_key_id):
+        """ Get an access key associated with an user, by its id.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param user: user name
+        :param access_key_id: access key id
+        :return: list of keys
+        """
+        url = "{}/users/{}/access_keys/{}".format(Bintray.BINTRAY_URL, user, access_key_id)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def _create_access_key(self, request_url, id, url=None, cache_for_secs=None, expiry=None,
+                           white_cidrs=None, black_cidrs=None, api_only=False):
+        """ Create a new access key identified by an access key id
+
+             An access key password will be auto-generated if not specified.
+
+        :param request_url: base_url
+        :param id: access key id
+        :param expiry: after that will be automatically revoked. (Unix epoch time in milliseconds)
+        :param url: URL for existence_check (callback)
+        :param cache_for_secs: specified period for caching result. minimum is 60 seconds.
+        :param white_cidrs: will allow access only for those IPs that exist in that address range
+        :param black_cidrs: will block access for all IPs that exist in the specified range.
+        :param api_only: allow access keys access to Bintray UI as well as to the API
+        :return: request response
+        """
+        json_data = {}
+        if id:
+            json_data["id"] = id
+        if expiry:
+            json_data["expiry"] = expiry
+        if url or cache_for_secs:
+            json_data["existence_check"] = {}
+            if url:
+                json_data["existence_check"]["url"] = url
+            if cache_for_secs:
+                json_data["existence_check"]["cache_for_secs"] = cache_for_secs
+        if white_cidrs:
+            json_data["white_cidrs"] = white_cidrs
+        if black_cidrs:
+            json_data["black_cidrs"] = black_cidrs
+        if api_only is not None:
+            json_data["api_only"] = api_only
+
+        response = self._requester.post(request_url, json=json_data)
+        self._logger.info("Post successfully")
+        return response
+
+    def create_access_key_org(self, org, id, url=None, cache_for_secs=None, expiry=None,
+                              white_cidrs=None, black_cidrs=None, api_only=False):
+        """ Create a new access key identified by an access key id, for an organization.
+
+             An access key password will be auto-generated if not specified.
+
+        :param org: organization name
+        :param id: access key id
+        :param expiry: after that will be automatically revoked. (Unix epoch time in milliseconds)
+        :param url: URL for existence_check (callback)
+        :param cache_for_secs: specified period for caching result. minimum is 60 seconds.
+        :param white_cidrs: will allow access only for those IPs that exist in that address range
+        :param black_cidrs: will block access for all IPs that exist in the specified range.
+        :param api_only: allow access keys access to Bintray UI as well as to the API
+        :return: request response
+        """
+        request_url = "{}/orgs/{}/access_keys".format(Bintray.BINTRAY_URL, org)
+        return self._create_access_key(request_url, id, url, cache_for_secs, expiry, white_cidrs,
+                                       black_cidrs, api_only)
+
+    def create_access_key_user(self, user, id, url=None, cache_for_secs=None, expiry=None,
+                               white_cidrs=None, black_cidrs=None, api_only=False):
+        """ Create a new access key identified by an access key id, for an user.
+
+             An access key password will be auto-generated if not specified.
+
+        :param user: user name
+        :param id: access key id
+        :param expiry: after that will be automatically revoked. (Unix epoch time in milliseconds)
+        :param url: URL for existence_check (callback)
+        :param cache_for_secs: specified period for caching result. minimum is 60 seconds.
+        :param white_cidrs: will allow access only for those IPs that exist in that address range
+        :param black_cidrs: will block access for all IPs that exist in the specified range.
+        :param api_only: allow access keys access to Bintray UI as well as to the API
+        :return: request response
+        """
+        request_url = "{}/users/{}/access_keys".format(Bintray.BINTRAY_URL, user)
+        return self._create_access_key(request_url, id, url, cache_for_secs, expiry, white_cidrs,
+                                       black_cidrs, api_only)
+
+    def delete_access_key_org(self, org, access_key_id):
+        """ Delete an access key associated with an organization.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param org: organization name
+        :param access_key_id: access key id
+        :return: request response
+        """
+        url = "{}/orgs/{}/access_keys/{}".format(Bintray.BINTRAY_URL, org, access_key_id)
+        response = self._requester.delete(url)
+        self._logger.info("Delete successfully")
+        return response
+
+    def delete_access_key_user(self, user, access_key_id):
+        """ Delete an access key associated with an user.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param user: user name
+        :param access_key_id: access key id
+        :return: request response
+        """
+        url = "{}/users/{}/access_keys/{}".format(Bintray.BINTRAY_URL, user, access_key_id)
+        response = self._requester.delete(url)
+        self._logger.info("Delete successfully")
+        return response
+
+    def _update_access_key(self, request_url, url=None, cache_for_secs=None, expiry=None,
+                           white_cidrs=None, black_cidrs=None):
+        """ Update an existing access key identified by an access key id
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param request_url: base_url
+        :param expiry: after that will be automatically revoked. (Unix epoch time in milliseconds)
+        :param url: URL for existence_check (callback)
+        :param cache_for_secs: specified period for caching result. minimum is 60 seconds.
+        :param white_cidrs: will allow access only for those IPs that exist in that address range
+        :param black_cidrs: will block access for all IPs that exist in the specified range.
+        :return: request response
+        """
+        json_data = {}
+        if expiry:
+            json_data["expiry"] = expiry
+        if url or cache_for_secs:
+            json_data["existence_check"] = {}
+            if url:
+                json_data["existence_check"]["url"] = url
+            if cache_for_secs:
+                json_data["existence_check"]["cache_for_secs"] = cache_for_secs
+        if white_cidrs:
+            json_data["white_cidrs"] = white_cidrs
+        if black_cidrs:
+            json_data["black_cidrs"] = black_cidrs
+
+        response = self._requester.patch(request_url, json=json_data)
+        self._logger.info("Post successfully")
+        return response
+
+    def update_access_key_org(self, org, access_key_id, url=None, cache_for_secs=None, expiry=None,
+                           white_cidrs=None, black_cidrs=None):
+        """ Update an existing access key identified by an access key id, for an organization.
+
+             Security: Authenticated user with 'admin' permission.
+
+        :param org: organization name
+        :param access_key_id: access key to be updated
+        :param expiry: after that will be automatically revoked. (Unix epoch time in milliseconds)
+        :param url: URL for existence_check (callback)
+        :param cache_for_secs: specified period for caching result. minimum is 60 seconds.
+        :param white_cidrs: will allow access only for those IPs that exist in that address range
+        :param black_cidrs: will block access for all IPs that exist in the specified range.
+        :return: request response
+        """
+        request_url = "{}/orgs/{}/access_keys/{}".format(Bintray.BINTRAY_URL, org, access_key_id)
+        return self._update_access_key(request_url, url, cache_for_secs, expiry, white_cidrs,
+                                       black_cidrs)
+
+    def update_access_key_user(self, user, access_key_id, url=None, cache_for_secs=None,
+                               expiry=None, white_cidrs=None, black_cidrs=None):
+        """ Update an existing access key identified by an access key id, for an user.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param user: user name
+        :param access_key_id: access key to be updated
+        :param expiry: after that will be automatically revoked. (Unix epoch time in milliseconds)
+        :param url: URL for existence_check (callback)
+        :param cache_for_secs: specified period for caching result. minimum is 60 seconds.
+        :param white_cidrs: will allow access only for those IPs that exist in that address range
+        :param black_cidrs: will block access for all IPs that exist in the specified range.
+        :return: request response
+        """
+        request_url = "{}/users/{}/access_keys/{}".format(Bintray.BINTRAY_URL, user, access_key_id)
+        return self._update_access_key(request_url, url, cache_for_secs, expiry, white_cidrs,
+                                       black_cidrs)
+
+    def get_entitlements(self, subject, repo=None, package=None, version=None, product=None):
+        """ Get the entitlements defined on the specified product, repository, package or version.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param version: package version
+        :param product: product name (only for Enterprise Account)
+        :return: entitlements list
+        """
+        if product:
+            url = "{}/products/{}/{}/entitlements".format(Bintray.BINTRAY_URL, subject, product)
+        else:
+            if version:
+                url = "{}/packages/{}/{}/{}/versions/{}/entitlements".format(Bintray.BINTRAY_URL,
+                                                                             subject, repo,
+                                                                             package, version)
+            elif package:
+                url = "{}/packages/{}/{}/{}/entitlements".format(Bintray.BINTRAY_URL, subject, repo,
+                                                                 package)
+            else:
+                url = "{}/packages/{}/{}/entitlements".format(Bintray.BINTRAY_URL, subject, repo)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def get_entitlement(self, subject, entitlement_id, repo=None, package=None, version=None,
+                        product=None):
+        """ Get an entitlement by its id and scope. Scope can be a product, a repository, a package
+            or a version.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param entitlement_id: entitlement to be acquired
+        :param repo: repository name
+        :param package: package name
+        :param version: package version
+        :param product: product name (only for Enterprise Account)
+        :return: entitlements list
+        """
+        if product:
+            url = "{}/products/{}/{}/entitlements/{}".format(Bintray.BINTRAY_URL, subject, product,
+                                                             entitlement_id)
+        else:
+            if version:
+                url = "{}/packages/{}/{}/{}/versions/{}/entitlements/{}".format(Bintray.BINTRAY_URL,
+                                                                                subject, repo,
+                                                                                package, version,
+                                                                                entitlement_id)
+            elif package:
+                url = "{}/packages/{}/{}/{}/entitlements/{}".format(Bintray.BINTRAY_URL, subject,
+                                                                    repo, package, entitlement_id)
+            else:
+                url = "{}/packages/{}/{}/entitlements/{}".format(Bintray.BINTRAY_URL, subject, repo,
+                                                                 entitlement_id)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
+
+    def create_entitlement(self, subject, repo=None, package=None, version=None,
+                           access=None, access_keys=None, path=None, tags=None, product=None):
+        """ Create an entitlement on the specified scope. Scope can be a product, a repository with
+            an optional path, a package or a version.
+
+            When specifying an optional path value for repository scope, path needs to be relative
+            and refer to a directory or a file in the repository.
+
+            Access mode can be either rw (read-write: implies download, upload and delete) or r
+            (read: implies download).
+
+            When specifying a scope with product, access mode can only be r (read: implies
+            download). Tags can be added for search purposes.
+
+            An entitlement id will be auto-generated if not specified.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param version: package version
+        :param product: product name (only for Enterprise Account)
+        :param access: entitlement access more (r/w)
+        :param access_keys: list of access keys
+        :param path: file path
+        :param tags: associated tags
+        :return: entitlements list
+        """
+        if product:
+            url = "{}/products/{}/{}/entitlements".format(Bintray.BINTRAY_URL, subject, product)
+        else:
+            if version:
+                url = "{}/packages/{}/{}/{}/versions/{}/entitlements".format(Bintray.BINTRAY_URL,
+                                                                             subject, repo,
+                                                                             package, version)
+            elif package:
+                url = "{}/packages/{}/{}/{}/entitlements".format(Bintray.BINTRAY_URL, subject, repo,
+                                                                 package)
+            else:
+                url = "{}/packages/{}/{}/entitlements".format(Bintray.BINTRAY_URL, subject, repo)
+
+        json_data = {}
+        if access:
+            json_data["access"] = access
+        if access_keys:
+            json_data["access_keys"] = access
+        if path:
+            json_data["path"] = path
+        if tags:
+            json_data["tags"] = tags
+
+        response = self._requester.post(url, json=json_data)
+        self._logger.info("Create successfully")
+        return response
+
+    def delete_entitlement(self, subject, entitlement_id, repo=None, package=None, version=None,
+                           product=None):
+        """ Delete an entitlement by its id and scope. Scope can be a product, a repository,
+            a package or a version.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param entitlement_id: entitlement to be deleted
+        :param repo: repository name
+        :param package: package name
+        :param version: package version
+        :param product: product name (only for Enterprise Account)
+        :return: entitlements list
+        """
+        if product:
+            url = "{}/products/{}/{}/entitlements/{}".format(Bintray.BINTRAY_URL, subject, product,
+                                                             entitlement_id)
+        else:
+            if version:
+                url = "{}/packages/{}/{}/{}/versions/{}/entitlements/{}".format(Bintray.BINTRAY_URL,
+                                                                                subject, repo,
+                                                                                package, version,
+                                                                                entitlement_id)
+            elif package:
+                url = "{}/packages/{}/{}/{}/entitlements/{}".format(Bintray.BINTRAY_URL, subject,
+                                                                    repo, package, entitlement_id)
+            else:
+                url = "{}/packages/{}/{}/entitlements/{}".format(Bintray.BINTRAY_URL, subject, repo,
+                                                                 entitlement_id)
+        response = self._requester.delete(url)
+        self._logger.info("Delete successfully")
+        return response
+
+    def update_entitlement(self, subject, entitlement_id, repo=None, package=None, version=None,
+                           access=None, access_keys=None, tags=None, product=None):
+        """ Update the information of the specified entitlement of a specified scope. Scope can be a
+            product, a repository with an optional path, a package or a version.
+
+            When specifying an optional path value for repository scope, path needs to be relative
+            and refer to a directory or a file in the repository.
+
+            Access mode can be either rw (read-write: implies download, upload and delete) or r
+            (read: implies download).
+
+            When specifying a scope with product, access mode can only be r (read: implies
+            download). Tags can be added for search purposes.
+
+            An entitlement id will be auto-generated if not specified.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param entitlement_id: entitlement id to be updated
+        :param repo: repository name
+        :param package: package name
+        :param version: package version
+        :param product: product name (only for Enterprise Account)
+        :param access: entitlement access more (r/w)
+        :param access_keys: list of access keys
+        :param tags: associated tags
+        :return: entitlements list
+        """
+        if product:
+            url = "{}/products/{}/{}/entitlements/{}".format(Bintray.BINTRAY_URL, subject, product,
+                                                             entitlement_id)
+        else:
+            if version:
+                url = "{}/packages/{}/{}/{}/versions/{}/entitlements/{}".format(Bintray.BINTRAY_URL,
+                                                                                subject, repo,
+                                                                                package, version,
+                                                                                entitlement_id)
+            elif package:
+                url = "{}/packages/{}/{}/{}/entitlements/{}".format(Bintray.BINTRAY_URL, subject,
+                                                                    repo, package, entitlement_id)
+            else:
+                url = "{}/packages/{}/{}/entitlements/{}".format(Bintray.BINTRAY_URL, subject, repo,
+                                                                 entitlement_id)
+        json_data = {}
+        if access:
+            json_data["access"] = access
+        if access_keys:
+            json_data["access_keys"] = access
+        if tags:
+            json_data["tags"] = tags
+
+        response = self._requester.patch(url, json=json_data)
+        self._logger.info("Update successfully")
+        return response
+
+    def search_entitlement_by_access_key(self, access_key=None, scope=None, product=None,
+                                         deep=False):
+        """ Search for entitlements for a specific access key in the specified scope.
+
+            The minimal scope is a subject.
+            You can optionally add a sub-scope of product, repo, package and version.
+
+            If deep equals true (default is false), will return all entitlements under the given
+            scope, for example, if scope is repository, existing package and version entitlements
+            under the given repository will be returned.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param access_key: specific access key to be searched
+        :param scope: specified scope to be used in the search
+        :param product: products name associated to the access key
+        :param deep: return all entitlements under the given scope
+        :return: entitlement found
+        """
+        url = "{}/search/entitlements".format(Bintray.BINTRAY_URL)
+        params = {"deep": bool_to_number(deep)}
+        if access_key:
+            params["access_key"] = access_key
+        if scope:
+            params["scope"] = scope
+        if product:
+            params["product"] = product
+
+        response = self._requester.get(url, params=params)
+        self._logger.info("Get successfully")
+        return response
+
+    def search_entitlement_by_tag(self, tag=None, scope=None, product=None, deep=False):
+        """ Search for entitlements for a specific tag in the specified scope.
+
+            The minimal scope is a subject.
+            You can optionally add a sub-scope of product, repo, package and version.
+
+            If deep equals true (default is false), will return all entitlements under the given
+            scope, for example, if scope is repository, existing package and version entitlements
+            under the given repository will be returned.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param tag: specific tag to be searched
+        :param scope: specified scope to be used in the search
+        :param product: products name associated to the access key
+        :param deep: return all entitlements under the given scope
+        :return: entitlement found
+        """
+        url = "{}/search/entitlements".format(Bintray.BINTRAY_URL)
+        params = {"deep": bool_to_number(deep)}
+        if tag:
+            params["tag"] = tag
+        if scope:
+            params["scope"] = scope
+        if product:
+            params["product"] = product
+
+        response = self._requester.get(url, params=params)
+        self._logger.info("Get successfully")
+        return response
