@@ -79,3 +79,14 @@ def test_update_entitlement():
         error_message = str(error)
 
     assert "Could not PATCH (403): forbidden" == error_message
+
+
+def test_search_entitlement_by_access_key():
+    bintray = Bintray()
+    error_message = ""
+    try:
+        bintray.search_entitlement_by_access_key("uilianries", "foobar", "generic/statistics/test")
+    except Exception as error:
+        error_message = str(error)
+
+    assert "Could not GET (403): Forbidden" == error_message
