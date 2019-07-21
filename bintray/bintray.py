@@ -3488,3 +3488,31 @@ class Bintray(object):
         request_url = "{}/users/{}/access_keys/{}".format(Bintray.BINTRAY_URL, user, access_key_id)
         return self._update_access_key(request_url, url, cache_for_secs, expiry, white_cidrs,
                                        black_cidrs)
+
+    def get_entitlements(self, subject, repo=None, package=None, version=None, product=None):
+        """ Get the entitlements defined on the specified product, repository, package or version.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param version: package version
+        :param product: product name (only for Enterprise Account)
+        :return: entitlements list
+        """
+        if product:
+            url = "{}/products/{}/{}/entitlements".format(Bintray.BINTRAY_URL, subject, product)
+        else:
+            if version:
+                url = "{}/packages/{}/{}/{}/versions/{}/entitlements".format(Bintray.BINTRAY_URL,
+                                                                             subject, repo,
+                                                                             package, version)
+            elif package:
+                url = "{}/packages/{}/{}/{}/entitlements".format(Bintray.BINTRAY_URL, subject, repo,
+                                                                 package)
+            else:
+                url = "{}/packages/{}/{}/entitlements".format(Bintray.BINTRAY_URL, subject, repo)
+        response = self._requester.get(url)
+        self._logger.info("Get successfully")
+        return response
