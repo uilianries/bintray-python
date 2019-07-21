@@ -18,3 +18,22 @@ def test_get_entitlements():
         error_message = str(error)
 
     assert "Could not GET (403): forbidden" == error_message
+
+
+def test_get_entitlement():
+    bintray = Bintray()
+    error_message = ""
+    try:
+        bintray.get_entitlement("uilianries", "foobar", "generic", "statistics", "test")
+    except Exception as error:
+        error_message = str(error)
+
+    assert "Could not GET (403): This resource is only available for subjects with entitlement " \
+           "management." == error_message
+
+    try:
+        bintray.get_entitlement("jfrog", "foobar", product="xray")
+    except Exception as error:
+        error_message = str(error)
+
+    assert "Could not GET (403): forbidden" == error_message
