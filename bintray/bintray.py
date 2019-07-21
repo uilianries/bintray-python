@@ -3606,3 +3606,37 @@ class Bintray(object):
         response = self._requester.post(url, json=json_data)
         self._logger.info("Create successfully")
         return response
+
+    def delete_entitlement(self, subject, entitlement_id, repo=None, package=None, version=None,
+                           product=None):
+        """ Delete an entitlement by its id and scope. Scope can be a product, a repository,
+            a package or a version.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param entitlement_id: entitlement to be deleted
+        :param repo: repository name
+        :param package: package name
+        :param version: package version
+        :param product: product name (only for Enterprise Account)
+        :return: entitlements list
+        """
+        if product:
+            url = "{}/products/{}/{}/entitlements/{}".format(Bintray.BINTRAY_URL, subject, product,
+                                                             entitlement_id)
+        else:
+            if version:
+                url = "{}/packages/{}/{}/{}/versions/{}/entitlements/{}".format(Bintray.BINTRAY_URL,
+                                                                                subject, repo,
+                                                                                package, version,
+                                                                                entitlement_id)
+            elif package:
+                url = "{}/packages/{}/{}/{}/entitlements/{}".format(Bintray.BINTRAY_URL, subject,
+                                                                    repo, package, entitlement_id)
+            else:
+                url = "{}/packages/{}/{}/entitlements/{}".format(Bintray.BINTRAY_URL, subject, repo,
+                                                                 entitlement_id)
+        response = self._requester.delete(url)
+        self._logger.info("Delete successfully")
+        return response
