@@ -3550,3 +3550,59 @@ class Bintray(object):
         response = self._requester.get(url)
         self._logger.info("Get successfully")
         return response
+
+    def create_entitlement(self, subject, repo=None, package=None, version=None,
+                           access=None, access_keys=None, path=None, tags=None, product=None):
+        """ Create an entitlement on the specified scope. Scope can be a product, a repository with
+            an optional path, a package or a version.
+
+            When specifying an optional path value for repository scope, path needs to be relative
+            and refer to a directory or a file in the repository.
+
+            Access mode can be either rw (read-write: implies download, upload and delete) or r
+            (read: implies download).
+
+            When specifying a scope with product, access mode can only be r (read: implies
+            download). Tags can be added for search purposes.
+
+            An entitlement id will be auto-generated if not specified.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param subject: repository owner
+        :param repo: repository name
+        :param package: package name
+        :param version: package version
+        :param product: product name (only for Enterprise Account)
+        :param access: entitlement access more (r/w)
+        :param access_keys: list of access keys
+        :param path: file path
+        :param tags: associated tags
+        :return: entitlements list
+        """
+        if product:
+            url = "{}/products/{}/{}/entitlements".format(Bintray.BINTRAY_URL, subject, product)
+        else:
+            if version:
+                url = "{}/packages/{}/{}/{}/versions/{}/entitlements".format(Bintray.BINTRAY_URL,
+                                                                             subject, repo,
+                                                                             package, version)
+            elif package:
+                url = "{}/packages/{}/{}/{}/entitlements".format(Bintray.BINTRAY_URL, subject, repo,
+                                                                 package)
+            else:
+                url = "{}/packages/{}/{}/entitlements".format(Bintray.BINTRAY_URL, subject, repo)
+
+        json_data = {}
+        if access:
+            json_data["access"] = access
+        if access_keys:
+            json_data["access_keys"] = access
+        if path:
+            json_data["path"] = path
+        if tags:
+            json_data["tags"] = tags
+
+        response = self._requester.post(url, json=json_data)
+        self._logger.info("Create successfully")
+        return response
