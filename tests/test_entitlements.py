@@ -90,3 +90,14 @@ def test_search_entitlement_by_access_key():
         error_message = str(error)
 
     assert "Could not GET (403): Forbidden" == error_message
+
+
+def test_search_entitlement_by_tag():
+    bintray = Bintray()
+    error_message = ""
+    try:
+        bintray.search_entitlement_by_tag("tag1", "jfrog/test-repo")
+    except Exception as error:
+        error_message = str(error)
+
+    assert "Could not GET (403): Forbidden" == error_message

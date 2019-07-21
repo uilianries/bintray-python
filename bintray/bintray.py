@@ -3728,3 +3728,34 @@ class Bintray(object):
         response = self._requester.get(url, params=params)
         self._logger.info("Get successfully")
         return response
+
+    def search_entitlement_by_tag(self, tag=None, scope=None, product=None, deep=False):
+        """ Search for entitlements for a specific tag in the specified scope.
+
+            The minimal scope is a subject.
+            You can optionally add a sub-scope of product, repo, package and version.
+
+            If deep equals true (default is false), will return all entitlements under the given
+            scope, for example, if scope is repository, existing package and version entitlements
+            under the given repository will be returned.
+
+            Security: Authenticated user with 'admin' permission.
+
+        :param tag: specific tag to be searched
+        :param scope: specified scope to be used in the search
+        :param product: products name associated to the access key
+        :param deep: return all entitlements under the given scope
+        :return: entitlement found
+        """
+        url = "{}/search/entitlements".format(Bintray.BINTRAY_URL)
+        params = {"deep": bool_to_number(deep)}
+        if tag:
+            params["tag"] = tag
+        if scope:
+            params["scope"] = scope
+        if product:
+            params["product"] = product
+
+        response = self._requester.get(url, params=params)
+        self._logger.info("Get successfully")
+        return response
