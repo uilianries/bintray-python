@@ -1,3 +1,6 @@
+> :warning: JFrog Bintray has been sunset, please, read the official [communication](https://jfrog.com/blog/into-the-sunset-bintray-jcenter-gocenter-and-chartcenter)
+
+
 # Bintray Python
 
 ![logo](logo.png)
